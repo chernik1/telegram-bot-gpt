@@ -1,72 +1,45 @@
 import telebot
-import webbrowser
-import sqlite3
-import requests
-import json
-import math
-
-
+from telebot import types
 
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
-commands = {
-    'commands_help': ['help'],
-    'commands_start': ['start', 'main'],
-    'commands_id': ['id'],
-    'commands_site': ['site', 'website'],
-}
+# Определение состояний
+states = {}
 
-# @bot.message_handler(content_types=['photo'])
-# def get_photo(message):
-#     markup = telebot.types.InlineKeyboardMarkup()
-#     btn1 = telebot.types.InlineKeyboardButton('Go site', url='https://google.com')
-#     btn2 = telebot.types.InlineKeyboardButton('Delete photo', callback_data='delete')
-#     btn3 = telebot.types.InlineKeyboardButton('Change photo', callback_data='edit')
-#     markup.row(btn1, btn2, btn3)
-#     bot.reply_to(message, 'Nice photo!', reply_markup=markup)
-#
-# @bot.callback_query_handler(func=lambda callback: True)
-# def callback_message(callback):
-#     if callback.data == 'delete':
-#         bot.delete_message(callback.message.chat.id, callback.message.message_id - 1)
-#     elif callback.data == 'edit':
-#         bot.edit_message_text('Edit text', callback.message.chat.id, callback.message.message_id)
-# @bot.message_handler(commands=commands['commands_site'])
-# def site(message):
-#     webbrowser.open('https://google.com')
-# @bot.message_handler(commands=commands['commands_help'])
-# def help(message):
-#     with open('Html/help.html', 'r', encoding='utf-8') as f:
-#         bot.send_message(message.chat.id, f.read(), parse_mode='HTML')
-@bot.message_handler(commands=commands['commands_start'])
+@bot.message_handler(commands=['start', 'main'])
 def start(message):
-    markup = telebot.types.ReplyKeyboardMarkup()
-    btn1 = telebot.types.KeyboardButton('Go site')
-    btn2 = telebot.types.KeyboardButton('Delete photo')
-    btn3 = telebot.types.KeyboardButton('Change photo')
-    markup.row(btn1)
-    markup.row(btn2, btn3)
+    markup = types.ReplyKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton('Set regex', callback_data='set_regex')
+    btn2 = types.InlineKeyboardButton('Set prompt', callback_data='set_prompt')
+    btn3 = types.InlineKeyboardButton('Spend data', callback_data='spend_data')
+    markup.add(btn1, btn2, btn3)
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
 
-    bot.register_next_step_handler(message, on_click)
+@bot.callback_query_handler(func=lambda callback: True)
+def callback_message(callback):
+    if callback.data == 'set_regex':
+        bot.send_message(callback.message.chat.id, 'Set regex action')
+    elif callback.data == 'set_prompt':
+        states[callback.message.chat.id] = 'set_prompt'
+        bot.send_message(callback.message.chat.id, 'Please enter the prompt:')
+    elif callback.data == 'spend_data':
+        bot.send_message(callback.message.chat.id, 'Spend data action')
 
-def on_click(message):
-    if message.text == 'Go site':
-        bot.send_message(message.chat.id, 'Go site')
-    elif message.text == 'Delete photo':
-        bot.send_message(message.chat.id, 'Delete photo')
-    elif message.text == 'Change photo':
-        bot.send_message(message.chat.id, 'Change photo')
+@bot.message_handler(func=lambda message: states.get(message.chat.id) == 'set_prompt')
+def handle_set_prompt(message):
+    # Выводим сохраненное сообщение пользователя
+    bot.send_message(message.chat.id, f'Your message: {message.text}')
+    states[message.chat.id] = None
 
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    if message.content_type == 'text':
+        if message.text == 'Set regex':
+            bot.send_message(message.chat.id, 'Set regex action')
+        elif message.text == 'Set prompt':
+            states[message.chat.id] = 'set_prompt'
+            bot.send_message(message.chat.id, 'Please enter the prompt:')
+        elif message.text == 'Spend data':
+            bot.send_message(message.chat.id, 'Spend data action')
 
-
-
-# @bot.message_handler(commands=commands['commands_id'])
-# def id(message):
-#     bot.reply_to(message, f'Your id: {message.chat.id}')
-# @bot.message_handler()
-# def echo_all(message):
-#     bot.send_message(message.chat.id, message.text)
-
-def start_bot():
-    bot.polling(none_stop=True)
+bot.polling()
