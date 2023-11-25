@@ -2,6 +2,8 @@ import g4f
 import re
 import asyncio
 import time
+from threading import Thread
+from queue import Queue
 
 async def make_promt(promt):
     try:
@@ -24,8 +26,8 @@ async def create_tasks(promt_list):
 
     return tasks
 
-async def main():
-    with open('question.txt', 'r', encoding='utf-8') as file:
+async def start_ai():
+    with open(r'G:\telegram-bot-gpt\ai\question.txt', 'r', encoding='utf-8') as file:
         question = file.read()
         regex = re.compile(r'\d.+')
         split_promt = re.findall(regex, question)
@@ -38,8 +40,32 @@ async def main():
     all_repsonse = []
 
     tasks = await create_tasks(promt_list)
+    print(tasks)
 
     responses = await asyncio.gather(*tasks)
 
     for response in responses:
         print(response.replace('\n', ''))
+
+    return responses
+
+def run_ai():
+    time_start = time.time()
+    result_queue = Queue()
+    print(time_start)
+    def run_async_code():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        result = loop.run_until_complete(start_ai())
+        loop.close()
+        result_queue.put(result)
+
+    thread = Thread(target=run_async_code)
+    thread.start()
+    thread.join()
+
+    result = result_queue.get()
+
+    print(time.time() - time_start)
+
+    return result
