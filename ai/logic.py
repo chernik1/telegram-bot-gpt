@@ -26,7 +26,7 @@ async def create_tasks(promt_list):
 
     return tasks
 
-async def start_ai():
+async def start_ai(promt_user=None):
     with open(r'G:\telegram-bot-gpt\ai\question.txt', 'r', encoding='utf-8') as file:
         question = file.read()
         regex = re.compile(r'\d.+')
@@ -35,7 +35,7 @@ async def start_ai():
             raise SyntaxError('Ничего не нашлось под регулярное выражение')
 
     base_sub = ' Реши задание. По формулам. Мне нужно будет скопировать твой текст, поэтому отвечай только кодировкой utf-8 не нужно использовать Markdown или Latex'
-    promt_list = [promt + base_sub for promt in split_promt]
+    promt_list = [promt + promt_user for promt in split_promt]
 
     all_repsonse = []
 
@@ -49,14 +49,14 @@ async def start_ai():
 
     return responses
 
-def run_ai():
+def run_ai(promt_user=None):
     time_start = time.time()
     result_queue = Queue()
     print(time_start)
     def run_async_code():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(start_ai())
+        result = loop.run_until_complete(start_ai(promt_user))
         loop.close()
         result_queue.put(result)
 
