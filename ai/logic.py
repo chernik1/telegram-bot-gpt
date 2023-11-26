@@ -4,6 +4,7 @@ import asyncio
 import time
 from threading import Thread
 from queue import Queue
+from config import Config
 
 async def make_promt(promt):
     try:
@@ -26,28 +27,55 @@ async def create_tasks(promt_list):
 
     return tasks
 
-async def start_ai(promt_user=None):
-    with open(r'G:\telegram-bot-gpt\ai\question.txt', 'r', encoding='utf-8') as file:
-        question = file.read()
-        regex = re.compile(r'\d.+')
-        split_promt = re.findall(regex, question)
-        if len(split_promt) == 0:
-            raise SyntaxError('Ничего не нашлось под регулярное выражение')
+async def validate_response(response):
+    regex_link_begin = r'\[\d+\]:\s*".*?"'
+    regex_link_end = r'\bhttps?://\S+\b'
 
-    base_sub = ' Реши задание. По формулам. Мне нужно будет скопировать твой текст, поэтому отвечай только кодировкой utf-8 не нужно использовать Markdown или Latex'
-    promt_list = [promt + promt_user for promt in split_promt]
+    new_reponse = re.sub(regex_link_begin, '', response)
+    new_reponse = re.sub(regex_link_end, '', new_reponse)
 
-    all_repsonse = []
+    return new_reponse.strip()
 
-    tasks = await create_tasks(promt_list)
-    print(tasks)
 
-    responses = await asyncio.gather(*tasks)
+async def start_ai(config: Config):
+    #promt_user = re.match(r'...+', promt_all, re.DOTALL)
+    # with open(r'G:\telegram-bot-gpt\ai\question.txt', 'r', encoding='utf-8') as file:
+    #     question = file.read()
+    #     regex = re.compile(r'\d.+')
+    #     split_promt = re.findall(regex, question)
+    #     if len(split_promt) == 0:
+    #         raise SyntaxError('Ничего не нашлось под регулярное выражение')
 
-    for response in responses:
-        print(response.replace('\n', ''))
+    promt = config.promt.strip()
+    symbols = config.symbols.strip()
+    regex = config.regex.strip()
+    promt = config.promt.strip()
+    tasks = config.tasks.strip()
+    promt_constant = config.promt_constant.strip()
 
-    return responses
+    if promt == '' and tasks != '' and promt_constant != '' and regex != '':
+
+        split_promt = re.findall(regex, tasks, re.DOTALL | re.I)
+
+        promt_list = [promt + ' ' + promt_constant + ' ' + f' Лимит символов не должен превышать {symbols}' for promt in split_promt]
+
+        all_repsonse = []
+
+        tasks = await create_tasks(promt_list)
+        print(tasks)
+
+        responses = await asyncio.gather(*tasks)
+
+        responses = [await validate_response(response) for response in responses]
+
+        status = True
+
+        return (responses, status)
+    elif promt != '':
+        pass
+    else:
+        status = False
+        return (None, status)
 
 def run_ai(promt_user=None):
     time_start = time.time()
