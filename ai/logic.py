@@ -28,11 +28,15 @@ async def create_tasks(promt_list):
     return tasks
 
 async def validate_response(response):
-    regex_link_begin = r'\[\d+\]:\s*".*?"'
-    regex_link_end = r'\bhttps?://\S+\b'
+    regex_link_begin = r'\[\d+\]:\s*".*?"' # ссылки в скобках
+    regex_link_end = r'\bhttps?://\S+\b' # конечные ссылки
+    regex_after_link = r'\[\d+\]:\s*(?:/\s*)?".*?"' # скобки
+    regex_bing = r'Здравствуйте, это Bing\..*?:' #привествия бинга
 
     new_reponse = re.sub(regex_link_begin, '', response)
     new_reponse = re.sub(regex_link_end, '', new_reponse)
+    new_reponse = re.sub(regex_after_link, '', new_reponse)
+    new_reponse = re.sub(regex_bing, '', new_reponse)
 
     return new_reponse.strip()
 
