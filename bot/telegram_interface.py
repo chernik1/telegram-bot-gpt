@@ -64,13 +64,20 @@ def run(message):
     global config
     responses, status = run_ai(config)
 
-    for response in responses:
-        bot.send_message(message.chat.id, response, reply_markup=markup)
+    for index, response in enumerate(responses, start=1):
+        with open(rf'G:\telegram-bot-gpt\file\{index}', 'a+', encoding='utf-8') as file:
+            file.write(f'{response}\n')
+        #bot.send_message(message.chat.id, response, reply_markup=markup)
+
 
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     global config
+    promt = message.text
+    config.promt = promt
+    response = run_ai(config)
+    bot.send_message(message.chat.id, response, reply_markup=markup)
     if message.content_type == 'text':
         if message.text == 'State':
             bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
