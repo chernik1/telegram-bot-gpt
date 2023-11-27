@@ -55,6 +55,7 @@ async def start_ai(config: Config):
 
     if promt == '' and tasks != '' and promt_constant != '' and regex != '':
 
+
         split_promt = re.findall(regex, tasks, re.DOTALL | re.I)
 
         promt_list = [promt + ' ' + promt_constant + ' ' + f' Лимит символов не должен превышать {symbols}' for promt in split_promt]
@@ -72,7 +73,27 @@ async def start_ai(config: Config):
 
         return (responses, status)
     elif promt != '':
-        pass
+        # 1. task \n 2. task \n .... .. promt
+        regex_for_task = config.regex.strip()
+        regex_for_promt = r'.. +'
+
+        promt = re.findall(regex_for_promt, promt, re.DOTALL)[0]
+        tasks = re.findall(regex_for_task, tasks, re.DOTALL)
+        symbols = config.symbols.strip()
+
+        promt_list = [task + ' ' + promt + ' ' + f' Лимит символов не должен превышать {symbols}' for task in tasks]
+
+        tasks = await create_tasks(promt_list)
+
+        responses = await asyncio.gather(*tasks)
+
+        responses = [await validate_response(response) for response in responses]
+
+        status = True
+
+        return (responses, status)
+
+
     else:
         status = False
         return (None, status)

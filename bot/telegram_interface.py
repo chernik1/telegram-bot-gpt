@@ -8,6 +8,7 @@ bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 # Конфиг
 config = Config()
 
+markup = None
 
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
