@@ -1,8 +1,8 @@
 import telebot
 from telebot import types
-from ai.logic import run_ai
 from config import Config
-from functions_for_buttons import *
+from .functions_for_buttons import *
+from class_lessons import *
 
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
@@ -10,6 +10,20 @@ bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 config = Config()
 
 markup = None
+
+dict_lessons_short = {
+    'm': Math,
+    'p': Programming,
+    'e': Economics,
+    'h': History,
+    'en': English,
+    'b': Biology,
+    'c': Chemistry,
+    'ph': Physics,
+    'bel': Belorussian,
+    'ma': MathAnalysis,
+    'mga': MathGeometryAndAlgebra,
+}
 
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
@@ -32,13 +46,14 @@ def start(message):
 
 
 
+
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     global config
-    promt = message.text
-    config.promt = promt
-    response = run_ai(config)
-    bot.send_message(message.chat.id, response, reply_markup=markup)
+    # promt = message.text
+    # config.promt = promt
+    # response = run_ai(config)
+    # bot.send_message(message.chat.id, response, reply_markup=markup)
     if message.content_type == 'text':
         if message.text == 'State':
             bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
@@ -63,6 +78,36 @@ def handle_message(message):
         elif message.text == 'Run':
             bot.send_message(message.chat.id, 'Please wait...', reply_markup=markup)
             run(message)
+
+@bot.message_handler(content_types=['document'])
+def receive_document(message):
+    if message.caption:
+        flag = False
+        try:
+            lesson = dict_lessons_short[message.caption.split()[0].lower()]
+            flag = True
+        except:
+            print('Предмет не найден')
+
+        if flag:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+            print(lesson.directory, message.document.file_name)
+            with open(f'lessons/{lesson.directory}/{message.document.file_name}', 'wb') as new_file:
+                new_file.write(downloaded_file)
+
+    bot.reply_to(message, 'File received')
+
+@bot.message_handler(content_types=['photo'])
+def receive_photo(message):
+
+    file_info = bot.get_file(message.photo[-1].file_id)
+    downloaded_file = bot.download_file(file_info.file_path)
+
+    with open(rf'{1}', 'wb') as new_file:
+        new_file.write(downloaded_file)
+
+    bot.reply_to(message, 'Photo received')
 
 def start_bot():
     bot.polling(none_stop=True)

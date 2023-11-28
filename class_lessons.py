@@ -79,7 +79,7 @@ class Physics(Lesson):
 @dataclasses.dataclass
 class Belorussian(Lesson):
     name = 'Belorussian'
-    short_name = 'b'
+    short_name = 'bel'
     directory = 'belorussian'
     regex_dict = {
         'regex': r'\d{1,2}\..+?(?=\n|$)',
@@ -88,7 +88,9 @@ class Belorussian(Lesson):
 @dataclasses.dataclass
 class MathAnalysis(Math):
     directory = f'{Math.directory}\\math_analysis'
+    short_name = 'ma'
 
 @dataclasses.dataclass
 class MathGeometryAndAlgebra(Math):
     directory = f'{Math.directory}\\math_geometry_and_algebra'
+    short_name = 'mga'

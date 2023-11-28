@@ -7,11 +7,11 @@ if __name__ == '__main__':
     #
     # cur = conn.cursor()
     #
-    # cur.execute("""CREATE TABLE IF NOT EXISTS users(
-    #    userid INT PRIMARY KEY,
-    #    fname TEXT,
-    #    lname TEXT,
-    #    gender TEXT);
+    # cur.execute("""CREATE TABLE IF NOT EXISTS lessons(
+    #    lesson_id INT PRIMARY KEY,
+    #    name TEXT,
+    #    short_name TEXT,
+    #    directory TEXT);
     # """)
     # conn.commit()
 

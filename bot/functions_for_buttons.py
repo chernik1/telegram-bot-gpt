@@ -1,3 +1,5 @@
+from tools.ai.logic import run_ai
+
 def promt_action(message):
     global config
 
