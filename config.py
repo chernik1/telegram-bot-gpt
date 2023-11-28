@@ -19,7 +19,9 @@ class Config:
 
 @dataclasses.dataclass
 class ConfigFast(Config):
-    pass
+    promt: str = ''
+    regex_tasks = ''
+    regex_promt = ''
 
 @dataclasses.dataclass
 class ConfigSlow(Config):
@@ -27,13 +29,15 @@ class ConfigSlow(Config):
 
 @dataclasses.dataclass
 class Lesson:
-     name: str = ''
-     regex: Dict[str, Any] = field(default_factory=defaultdict)
-     promt: str = ''
-     tasks: str = ''
-     file: str = ''
-     promt_constant: str = ''
-     regex_promt: str = ''
+     name: str
+     short_name: str
+     directory: str
+     regex_dict: Dict[str, str]
+     short_name_regex: str = r'\.\.[a-z]'
+     symbols_promt: str = '2000'
+     format_file: str = 'txt'
+
+
 
 
 
