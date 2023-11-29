@@ -3,6 +3,7 @@ from telebot import types
 from config import Config, ConfigConstructor, ConfigOneMessage
 from .functions_for_buttons import *
 from class_lessons import *
+import os
 
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
@@ -10,6 +11,7 @@ bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 config = ConfigConstructor()
 
 markup = None
+markup_config = None
 
 dict_lessons_short = {
     'm': Math,
@@ -35,64 +37,56 @@ def start(message):
     btn3 = types.KeyboardButton('ConfigOneMessage')
     btn4 = types.KeyboardButton('ConfigConstructor')
     btn5 = types.KeyboardButton('Check directorys')
-    # btn3 = types.KeyboardButton('Promt')
-    # btn4 = types.KeyboardButton('Set tasks')
-    # btn5 = types.KeyboardButton('Set constant promt')
-    # btn6 = types.KeyboardButton('Set regex')
-    # btn7 = types.KeyboardButton('Set symbols')
-    # btn8 = types.KeyboardButton('Run')
+    btn6 = types.KeyboardButton('Menu config')
 
-    # markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8)
-
-    markup.add(btn1, btn2, btn3, btn4)
+    markup.add(btn1, btn2, btn3, btn4, btn5)
 
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, handle_message)
 
+def check_directorys(message):
+    lesson = dict_lessons_short[message.text]
 
+    for file in os.listdir(f'lessons/{lesson.directory}'):
+        bot.send_message(message.chat.id, file, reply_markup=markup)
 
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
-    if isinstance(config, ConfigOneMessage):
-        global config
-        promt = message.text
-        config.promt = promt
-        response = run_ai(config)
-        
-        bot.send_message(message.chat.id, response, reply_markup=markup)
+    global config
+    global markup_config
+
     if message.content_type == 'text':
         if message.text == 'ConfigOneMessage':
+            config = ConfigOneMessage()
             bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
         elif message.text == 'ConfigConstructor':
-            config = Config()
-            bot.send_message(message.chat.id, 'Completed \n' + config.__str__(), reply_markup=markup)
+            config = ConfigConstructor()
+            bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
         elif message.text == 'State':
             bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
         elif message.text == 'Clear state':
             config = ConfigConstructor()
             bot.send_message(message.chat.id, 'Completed \n' + config.__str__(), reply_markup=markup)
         elif message.text == 'Check directorys':
-            pass
+            try:
+                bot.send_message(message.chat.id, f'Please enter the lesson short name: ', reply_markup=markup)
+                bot.register_next_step_handler(message, check_directorys)
+            except:
+                bot.send_message(message.chat.id, 'Ошибка в ведение имени директории', reply_markup=markup)
+        elif message.text == 'Menu config':
+            btn1 = types.KeyboardButton('Constant promt')
+            btn2 = types.KeyboardButton('Tasks')
+            btn3 = types.KeyboardButton('Regex promt')
+            btn4 = types.KeyboardButton('Symbols')
+            btn5 = types.KeyboardButton('Run')
 
-        # elif message.text == 'Promt':
-        #     bot.send_message(message.chat.id, 'Please enter the prompt: ', reply_markup=markup)
-        #     bot.register_next_step_handler(message, promt_action)
-        # elif message.text == 'Set tasks':
-        #     bot.send_message(message.chat.id, 'Please enter the tasks: ', reply_markup=markup)
-        #     bot.register_next_step_handler(message, set_tasks)
-        # elif message.text == 'Set constant promt':
-        #     bot.send_message(message.chat.id, 'Please enter the constant promt: ', reply_markup=markup)
-        #     bot.register_next_step_handler(message, set_constant_promt)
-        # elif message.text == 'Set regex':
-        #     bot.send_message(message.chat.id, 'Please enter the regex: ', reply_markup=markup)
-        #     bot.register_next_step_handler(message, set_regex)
-        # elif message.text == 'Set symbols':
-        #     bot.send_message(message.chat.id, 'Please enter the symbols: ', reply_markup=markup)
-        #     bot.register_next_step_handler(message, set_symbols)
-        # elif message.text == 'Run':
-        #     bot.send_message(message.chat.id, 'Please wait...', reply_markup=markup)
-        #     run(message)
+        elif isinstance(config, ConfigOneMessage):
+            promt = message.text
+            config.promt = promt
+            response = run_ai(config)
+
+            bot.send_message(message.chat.id, response, reply_markup=markup)
 
 @bot.message_handler(content_types=['document'])
 def receive_document(message):
