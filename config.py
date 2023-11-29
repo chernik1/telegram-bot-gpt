@@ -18,13 +18,13 @@ class Config:
 
 
 @dataclasses.dataclass
-class ConfigFast(Config):
+class ConfigOneMessage(Config):
     promt: str = ''
     regex_tasks = ''
     regex_promt = ''
 
 @dataclasses.dataclass
-class ConfigSlow(Config):
+class ConfigConstructor(Config):
     pass
 
 @dataclasses.dataclass
