@@ -188,13 +188,16 @@ def reader(path):
                     page_text.append('table')
                     line_format.append('table')
 
-                # Проверяем, извлекли ли мы уже таблицы из этой страницы
-                if element.y0 >= lower_side and element.y1 <= upper_side:
-                    pass
-                elif not isinstance(page_elements[i + 1][1], LTRect):
-                    table_extraction_flag = False
-                    first_element = True
-                    table_num += 1
+                try:
+                    # Проверяем, извлекли ли мы уже таблицы из этой страницы
+                    if element.y0 >= lower_side and element.y1 <= upper_side:
+                        pass
+                    elif not isinstance(page_elements[i + 1][1], LTRect):
+                        table_extraction_flag = False
+                        first_element = True
+                        table_num += 1
+                except:
+                    print('Невозможно извлечь таблицу')
 
         # Создаём ключ для словаря
         dctkey = 'Page_' + str(pagenum)
@@ -205,10 +208,12 @@ def reader(path):
     pdfFileObj.close()
 
     # Удаляем созданные дополнительные файлы
-    # os.remove('cropped_image.pdf')
-    # os.remove('PDF_image.png')
-
+    os.remove('cropped_image.pdf')
+    os.remove('PDF_image.png')
+    # ToDo:  Сделать красивый вывод, пофиксить баг с таблицами.
     # Удаляем содержимое страницы
-    result = ''.join(text_per_page['Page_0'][4])
+    result = ''
+    for text in list(text_per_page.keys()):
+        result += text_per_page[text][3][0].replace('|', '')
     print(result)
     return result
