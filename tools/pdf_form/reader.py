@@ -66,7 +66,8 @@ def image_to_text(image_path):
     # Считываем изображение
     img = Image.open(image_path)
     # Извлекаем текст из изображения
-    text = pytesseract.image_to_string(img)
+    #text = pytesseract.image_to_string(img)
+    text = pytesseract.image_to_string(img, lang='rus+eng')
     return text
 
 
@@ -214,6 +215,10 @@ def reader(path):
     # Удаляем содержимое страницы
     result = ''
     for text in list(text_per_page.keys()):
-        result += text_per_page[text][3][0].replace('|', '')
+        for line in text_per_page[text]:
+            for j in range(len(line)):
+                if isinstance(line[j], list):
+                    continue
+                result += line[j] + '\n'
     print(result)
     return result
