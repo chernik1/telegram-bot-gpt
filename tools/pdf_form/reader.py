@@ -211,14 +211,12 @@ def reader(path):
     # Удаляем созданные дополнительные файлы
     os.remove('cropped_image.pdf')
     os.remove('PDF_image.png')
-    # ToDo:  Сделать красивый вывод, пофиксить баг с таблицами.
+    # ToDo:  Пофиксить баг с таблицами.
     # Удаляем содержимое страницы
     result = ''
-    for text in list(text_per_page.keys()):
-        for line in text_per_page[text]:
-            for j in range(len(line)):
-                if isinstance(line[j], list):
-                    continue
-                result += line[j] + '\n'
+    for key in list(text_per_page.keys()):
+        text_list = text_per_page[key][2]
+        for text in text_list:
+            result += text + '\n'
     print(result)
     return result
