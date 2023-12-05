@@ -1,8 +1,10 @@
 import aspose.slides as slides
 import re
 
-# Load presentation
-pres = slides.Presentation(r"G:\telegram-bot-gpt\tools\ppt_form\ЛК-2  Ч-1 ИЗМЕР. ТЕОРИЯ.ptx.pptx")
+def is_form_new_ppt(path: str, promt: str) -> list:
 
-# Convert PPTX to PDF
-pres.save("pptx-to-pdf.pdf", slides.export.SaveFormat.PDF)
+    # Load presentation
+    pres = slides.Presentation(fr'{path}')
+
+    # Convert PPTX to PDF
+    pres.save("pptx-to-pdf.pdf", slides.export.SaveFormat.PDF)

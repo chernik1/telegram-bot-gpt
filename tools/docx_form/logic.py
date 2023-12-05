@@ -1,5 +1,7 @@
 import aspose.words as aw
 import re
 
-doc = aw.Document(r"G:\telegram-bot-gpt\tools\docx_form\Input.docx")
-doc.save("Output.pdf")
+def is_form_new_docx(path: str, promt: str):
+
+    doc = aw.Document(fr'{path}')
+    doc.save("Output.pdf")

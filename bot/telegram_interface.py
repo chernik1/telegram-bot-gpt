@@ -141,8 +141,8 @@ def receive_document(message):
                 response = is_form_new_docx(file_add, message.text)
                 for resp in response:
                     bot.send_message(message.chat.id, resp, reply_markup=markup)
-            elif file_format == 'txt':
-                response = is_form_new_txt(file_add, message.text)
+            elif file_format == 'pptx':
+                response = is_form_new_ppt(file_add, message.text)
                 for resp in response:
                     bot.send_message(message.chat.id, resp, reply_markup=markup)
 
