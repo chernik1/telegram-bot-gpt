@@ -5,6 +5,9 @@ from .functions_for_buttons import *
 from class_lessons import *
 import os
 from tools.pdf_form.logic import is_form_new_pdf
+from tools.ppt_form.logic import is_form_new_ppt
+from tools.docx_form.logic import is_form_new_docx
+
 
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
@@ -129,6 +132,20 @@ def receive_document(message):
                 new_file.write(downloaded_file)
 
             file_add = f'lessons/{lesson.directory}/{message.document.file_name}'
+            file_format = file_add.split('.')[-1]
+            if file_format == 'pdf':
+                response = is_form_new_pdf(file_add, message.text)
+                for resp in response:
+                    bot.send_message(message.chat.id, resp, reply_markup=markup)
+            elif file_format == 'docx':
+                response = is_form_new_docx(file_add, message.text)
+                for resp in response:
+                    bot.send_message(message.chat.id, resp, reply_markup=markup)
+            elif file_format == 'txt':
+                response = is_form_new_txt(file_add, message.text)
+                for resp in response:
+                    bot.send_message(message.chat.id, resp, reply_markup=markup)
+
 
     bot.reply_to(message, 'File received')
 
