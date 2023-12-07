@@ -28,17 +28,20 @@ async def create_tasks(promt_list):
     return tasks
 
 async def validate_response(response):
-    regex_link_begin = r'\[\d+\]:\s*".*?"' # ссылки в скобках
-    regex_link_end = r'\bhttps?://\S+\b' # конечные ссылки
-    regex_after_link = r'\[\d+\]:\s*(?:/\s*)?".*?"' # скобки
-    regex_bing = r'Здравствуйте, это Bing\..*?.' #привествия бинга
+    try:
+        regex_link_begin = r'\[\d+\]:\s*".*?"' # ссылки в скобках
+        regex_link_end = r'\bhttps?://\S+\b' # конечные ссылки
+        regex_after_link = r'\[\d+\]:\s*(?:/\s*)?".*?"' # скобки
+        regex_bing = r'Здравствуйте, это Bing\..*?.' #привествия бинга
 
-    new_reponse = re.sub(regex_link_begin, '', response)
-    new_reponse = re.sub(regex_link_end, '', new_reponse)
-    new_reponse = re.sub(regex_after_link, '', new_reponse)
-    new_reponse = re.sub(regex_bing, '', new_reponse)
+        new_reponse = re.sub(regex_link_begin, '', response)
+        new_reponse = re.sub(regex_link_end, '', new_reponse)
+        new_reponse = re.sub(regex_after_link, '', new_reponse)
+        new_reponse = re.sub(regex_bing, '', new_reponse)
 
-    return new_reponse.strip()
+        return new_reponse.strip()
+    except:
+        return 'Неудача'
 
 
 async def start_ai(config: Config):
@@ -50,10 +53,10 @@ async def start_ai(config: Config):
     #     if len(split_promt) == 0:
     #         raise SyntaxError('Ничего не нашлось под регулярное выражение')
 
-    promt = config.promt.strip()
+    # promt = config.promt.strip()
+    promt = ''
     symbols = config.symbols.strip()
     regex = config.regex.strip()
-    promt = config.promt.strip()
     tasks = config.tasks.strip()
     promt_constant = config.promt_constant.strip()
 

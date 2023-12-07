@@ -5,8 +5,9 @@ from .functions_for_buttons import *
 from class_lessons import *
 import os
 from tools.pdf_form.logic import is_form_new_pdf
-from tools.ppt_form.logic import is_form_new_ppt
-from tools.docx_form.logic import is_form_new_docx
+import re
+# from tools.ppt_form.logic import is_form_new_ppt
+# from tools.docx_form.logic import is_form_new_docx
 
 
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
@@ -53,20 +54,20 @@ def start(message):
 def check_directorys(message):
     lesson = dict_lessons_short[message.text]
 
-    for file in os.listdir(f'lessons/{lesson.directory}'):
+    for file in os.listdir(rf'{config.directory}/{lesson.directory}'):
         bot.send_message(message.chat.id, file, reply_markup=markup)
 
 
-@bot.message_handler(func=lambda message: True)
-def handle_message_file(message):
-    if message.text == 'File add':
-        bot.send_message(message.chat.id, 'Please send file')
-        bot.register_next_step_handler(message, receive_document)
-    elif message.text == 'Check text':
-        file_path = rf'{file_add}'
-        response = is_form_new_pdf(file_path, message.text)
-        for resp in response:
-            bot.send_message(message.chat.id, resp, reply_markup=markup)
+# @bot.message_handler(func=lambda message: True)
+# def handle_message_file(message):
+#     if message.text == 'File add':
+#         bot.send_message(message.chat.id, 'Please send file')
+#         bot.register_next_step_handler(message, receive_document)
+#     elif message.text == 'Check text':
+#         file_path = rf'{file_add}'
+#         response = is_form_new_pdf(file_path, message.text)
+#         for resp in response:
+#             bot.send_message(message.chat.id, resp, reply_markup=markup)
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
@@ -106,6 +107,19 @@ def handle_message(message):
             markup = types.ReplyKeyboardMarkup()
             markup.add(btn1, btn2)
             bot.send_message(message.chat.id, 'Menu file', reply_markup=markup)
+        elif message.text[:5] == 'promt':
+            message.text = message.text[5:]
+            info = message.text.split('***')
+            config.tasks = info[0]
+            config.promt_constant = info[1]
+            if len(info) > 1:
+                config.symbols = info[2]
+            responses, status = run_ai(config)
+            if status:
+                for index, response in enumerate(responses, 1):
+                    with open(rf'{index}.txt', 'a+', encoding='utf-8') as file:
+                        file.write(f'{index} {response}\n')
+                    bot.send_message(message.chat.id, 'ок')
         elif isinstance(config, ConfigOneMessage):
             promt = message.text
             config.promt = promt
@@ -137,14 +151,14 @@ def receive_document(message):
                 response = is_form_new_pdf(file_add, message.text)
                 for resp in response:
                     bot.send_message(message.chat.id, resp, reply_markup=markup)
-            elif file_format == 'docx':
-                response = is_form_new_docx(file_add, message.text)
-                for resp in response:
-                    bot.send_message(message.chat.id, resp, reply_markup=markup)
-            elif file_format == 'pptx':
-                response = is_form_new_ppt(file_add, message.text)
-                for resp in response:
-                    bot.send_message(message.chat.id, resp, reply_markup=markup)
+            # elif file_format == 'docx':
+            #     response = is_form_new_docx(file_add, message.text)
+            #     for resp in response:
+            #         bot.send_message(message.chat.id, resp, reply_markup=markup)
+            # elif file_format == 'pptx':
+            #     response = is_form_new_ppt(file_add, message.text)
+            #     for resp in response:
+            #         bot.send_message(message.chat.id, resp, reply_markup=markup)
 
 
     bot.reply_to(message, 'File received')
