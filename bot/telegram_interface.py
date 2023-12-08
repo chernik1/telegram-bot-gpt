@@ -38,15 +38,9 @@ def start(message):
     global markup
     markup = types.ReplyKeyboardMarkup()
 
-    btn1 = types.KeyboardButton('State')
-    btn2 = types.KeyboardButton('Clear state')
-    btn3 = types.KeyboardButton('ConfigOneMessage')
-    btn4 = types.KeyboardButton('ConfigConstructor')
-    btn5 = types.KeyboardButton('Check directorys')
-    btn6 = types.KeyboardButton('Menu config')
-    btn7 = types.KeyboardButton('Menu file')
+    btn1 = types.KeyboardButton('help')
 
-    markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
+    markup.add(btn1)
 
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, handle_message)
@@ -75,40 +69,10 @@ def handle_message(message):
     global markup_config
 
     if message.content_type == 'text':
-        if message.text == 'ConfigOneMessage':
-            config = ConfigOneMessage()
-            bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
-        elif message.text == 'ConfigConstructor':
-            config = ConfigConstructor()
-            bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
-        elif message.text == 'State':
-            bot.send_message(message.chat.id, config.__str__(), reply_markup=markup)
-        elif message.text == 'Clear state':
-            config = ConfigConstructor()
-            bot.send_message(message.chat.id, 'Completed \n' + config.__str__(), reply_markup=markup)
-        elif message.text == 'Check directorys':
-            try:
-                bot.send_message(message.chat.id, f'Please enter the lesson short name: ', reply_markup=markup)
-                bot.register_next_step_handler(message, check_directorys)
-            except:
-                bot.send_message(message.chat.id, 'Ошибка в ведение имени директории', reply_markup=markup)
-        elif message.text == 'Menu config':
-            btn1 = types.KeyboardButton('Constant promt')
-            btn2 = types.KeyboardButton('Tasks')
-            btn3 = types.KeyboardButton('Regex promt')
-            btn4 = types.KeyboardButton('Symbols')
-            btn5 = types.KeyboardButton('Run')
-            markup = types.ReplyKeyboardMarkup()
-            markup.add(btn1, btn2, btn3, btn4, btn5)
-            bot.send_message(message.chat.id, 'Menu config', reply_markup=markup)
-        elif message.text == 'Menu file':
-            btn1 = types.KeyboardButton('File add')
-            btn2 = types.KeyboardButton('Check text')
-            markup = types.ReplyKeyboardMarkup()
-            markup.add(btn1, btn2)
-            bot.send_message(message.chat.id, 'Menu file', reply_markup=markup)
-        elif message.text[:5] == 'promt':
-            message.text = message.text[5:]
+        if message.text[:6] == 'promt ' and len(message.text.split('***')) == 3:
+            pass
+        elif message.text[:6] == 'promt ':
+            message.text = message.text[6:]
             info = message.text.split('***')
             config.tasks = info[0]
             config.promt_constant = info[1]
@@ -120,12 +84,12 @@ def handle_message(message):
                     with open(rf'{index}.txt', 'a+', encoding='utf-8') as file:
                         file.write(f'{index} {response}\n')
                     bot.send_message(message.chat.id, 'ок')
-        elif isinstance(config, ConfigOneMessage):
-            promt = message.text
-            config.promt = promt
-            response = run_ai(config)
-
-            bot.send_message(message.chat.id, response, reply_markup=markup)
+        elif message.text.lower() == 'help':
+            bot.send_message(message.chat.id, """
+                    Help
+Обычный запрос - promt tasks***promt_constant
+Запрос о предмете - promt lesson***tasks***promt_constant
+            """, reply_markup=markup)
 
 @bot.message_handler(content_types=['document'])
 def receive_document(message):
