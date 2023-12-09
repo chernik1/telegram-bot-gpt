@@ -76,7 +76,7 @@ def handle_message(message):
             info = message.text.split('***')
             config.tasks = info[0]
             config.promt_constant = info[1]
-            if len(info) > 1:
+            if len(info) > 2:
                 config.symbols = info[2]
             responses, status = run_ai(config)
             if status:
