@@ -1,10 +1,10 @@
 import telebot
 from telebot import types
 from config import Config, ConfigConstructor, ConfigOneMessage
-from .functions_for_buttons import *
 from class_lessons import *
 import os
 from tools.pdf_form.logic import is_form_new_pdf
+from tools.ai.logic import start_ai
 import re
 # from tools.ppt_form.logic import is_form_new_ppt
 # from tools.docx_form.logic import is_form_new_docx
@@ -35,6 +35,7 @@ dict_lessons_short = {
 
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
+    """Функция запуска интерфейса для пользователя"""
     global markup
     markup = types.ReplyKeyboardMarkup()
 
@@ -46,6 +47,7 @@ def start(message):
     bot.register_next_step_handler(message, handle_message)
 
 def check_directorys(message):
+    """Функция проверки директорий"""
     lesson = dict_lessons_short[message.text]
 
     for file in os.listdir(rf'{config.directory}/{lesson.directory}'):
@@ -65,6 +67,7 @@ def check_directorys(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
+    """Функция обработки сообщений"""
     global config
     global markup_config
 
@@ -93,6 +96,7 @@ def handle_message(message):
 
 @bot.message_handler(content_types=['document'])
 def receive_document(message):
+    """Функция получения файла"""
     global file_add
     if message.caption:
         flag = False
@@ -129,7 +133,7 @@ def receive_document(message):
 
 @bot.message_handler(content_types=['photo'])
 def receive_photo(message):
-
+    """Функция получения фото"""
     file_info = bot.get_file(message.photo[-1].file_id)
     downloaded_file = bot.download_file(file_info.file_path)
 
@@ -139,5 +143,6 @@ def receive_photo(message):
     bot.reply_to(message, 'Photo received')
 
 def start_bot():
+    """Функция запуска бота"""
     bot.polling(none_stop=True)
 
