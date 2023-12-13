@@ -1,10 +1,9 @@
 import telebot
 from telebot import types
 from config import Config, ConfigConstructor, ConfigOneMessage
-from class_lessons import *
 import os
 from tools.pdf_form.logic import is_form_new_pdf
-from tools.ai.logic import start_ai
+from tools.ai.logic import run_ai
 import re
 # from tools.ppt_form.logic import is_form_new_ppt
 # from tools.docx_form.logic import is_form_new_docx
