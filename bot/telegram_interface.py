@@ -18,20 +18,6 @@ markup = None
 markup_config = None
 file_add = ''
 
-dict_lessons_short = {
-    'm': Math,
-    'p': Programming,
-    'e': Economics,
-    'h': History,
-    'en': English,
-    'b': Biology,
-    'c': Chemistry,
-    'ph': Physics,
-    'bel': Belorussian,
-    'ma': MathAnalysis,
-    'mga': MathGeometryAndAlgebra,
-}
-
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
     """Функция запуска интерфейса для пользователя"""
@@ -44,14 +30,6 @@ def start(message):
 
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, handle_message)
-
-def check_directorys(message):
-    """Функция проверки директорий"""
-    lesson = dict_lessons_short[message.text]
-
-    for file in os.listdir(rf'{config.directory}/{lesson.directory}'):
-        bot.send_message(message.chat.id, file, reply_markup=markup)
-
 
 # @bot.message_handler(func=lambda message: True)
 # def handle_message_file(message):
@@ -72,6 +50,8 @@ def handle_message(message):
 
     if message.content_type == 'text':
         if message.text[:6] == 'promt ' and len(message.text.split('***')) == 3:
+            pass
+        elif message.text[:6] == 'promt ' and len(message.text.split('***')) == 2:
             pass
         elif message.text[:6] == 'promt ':
             message.text = message.text[6:]
@@ -99,20 +79,13 @@ def receive_document(message):
     global file_add
     if message.caption:
         flag = False
-        try:
-            lesson = dict_lessons_short[message.caption.split()[0].lower()]
-            flag = True
-        except:
-            print('Предмет не найден')
-
         if flag:
             file_info = bot.get_file(message.document.file_id)
             downloaded_file = bot.download_file(file_info.file_path)
-            print(lesson.directory, message.document.file_name)
-            with open(f'lessons/{lesson.directory}/{message.document.file_name}', 'wb') as new_file:
+            with open(f'{message.document.file_name}', 'wb') as new_file:
                 new_file.write(downloaded_file)
 
-            file_add = f'lessons/{lesson.directory}/{message.document.file_name}'
+            file_add = f'{message.document.file_name}'
             file_format = file_add.split('.')[-1]
             if file_format == 'pdf':
                 response = is_form_new_pdf(file_add, message.text)
