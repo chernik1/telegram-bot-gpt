@@ -32,6 +32,7 @@ def start(message):
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, handle_message)
 
+
 # @bot.message_handler(func=lambda message: True)
 # def handle_message_file(message):
 #     if message.text == 'File add':
