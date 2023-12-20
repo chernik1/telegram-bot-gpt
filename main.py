@@ -3,17 +3,16 @@ import sqlite3
 
 
 if __name__ == '__main__':
-    # conn = sqlite3.connect(r'db/database.db')
-    #
-    # cur = conn.cursor()
-    #
-    # cur.execute("""CREATE TABLE IF NOT EXISTS lessons(
-    #    lesson_id INT PRIMARY KEY,
-    #    name TEXT,
-    #    short_name TEXT,
-    #    directory TEXT);
-    # """)
-    # conn.commit()
+    conn = sqlite3.connect(r'db/database.db')
+
+    cur = conn.cursor()
+
+    cur.execute("""CREATE TABLE IF NOT EXISTS lessons(
+       lesson_id INT PRIMARY KEY,
+       name_lesson TEXT,
+       answer TEXT,
+    """)
+    conn.commit()
 
 
     start_bot()

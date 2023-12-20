@@ -5,6 +5,7 @@ import os
 from tools.pdf_form.logic import is_form_new_pdf
 from tools.ai.logic import run_ai
 import re
+import sqlite3
 # from tools.ppt_form.logic import is_form_new_ppt
 # from tools.docx_form.logic import is_form_new_docx
 
@@ -54,20 +55,28 @@ def handle_message(message):
         if message.text[:6] == 'promt ' and len(message.text.split('***')) == 3:
             pass
         elif message.text[:6] == 'promt ' and len(message.text.split('***')) == 2:
-            pass
-        elif message.text[:6] == 'promt ':
             message.text = message.text[6:]
             info = message.text.split('***')
-            config.tasks = info[0]
-            config.promt_constant = info[1]
-            if len(info) > 2:
-                config.symbols = info[2]
-            responses, status = run_ai(config)
-            if status:
-                for index, response in enumerate(responses, 1):
-                    with open(rf'{index}.txt', 'a+', encoding='utf-8') as file:
-                        file.write(f'{index} {response}\n')
-                    bot.send_message(message.chat.id, 'ок')
+            config.lesson = info[0]
+            config.tasks = info[1]
+            config.promt_constant = info[2]
+
+            responses = run_ai(config)
+
+            for index, response in enumerate(responses):
+                bot.send_message(message.chat.id, response, reply_markup=markup)
+
+                conn = sqlite3.connect(r'db/database.db')
+
+                cur = conn.cursor()
+
+                cur.execute(f"""INSERT INTO lessons(lesson_id, name_lesson, answer) VALUES(
+                    {index}, '{info[0]}', '{response}')"""
+                )
+                conn.commit()
+
+        elif message.text[:6] == 'promt ':
+            pass
         elif message.text.lower() == 'help':
             bot.send_message(message.chat.id, """
                     Help
