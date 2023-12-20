@@ -52,30 +52,37 @@ def handle_message(message):
     global markup_config
 
     if message.content_type == 'text':
-        if message.text[:6] == 'promt ' and len(message.text.split('***')) == 3:
+        if message.text[:6] == 'prompt ' and len(message.text.split('***')) == 4:
             pass
-        elif message.text[:6] == 'promt ' and len(message.text.split('***')) == 2:
-            message.text = message.text[6:]
+        elif message.text[:7] == 'prompt ' and len(message.text.split('***')) == 3:
+            message.text = message.text[7:]
             info = message.text.split('***')
             config.lesson = info[0]
             config.tasks = info[1]
             config.promt_constant = info[2]
 
-            responses = run_ai(config)
+            responses_status = run_ai(config)
 
-            for index, response in enumerate(responses):
-                bot.send_message(message.chat.id, response, reply_markup=markup)
+            responses = responses_status[0]
+            status = responses_status[1]
 
-                conn = sqlite3.connect(r'db/database.db')
+            if status:
+                for response in responses:
+                    bot.send_message(message.chat.id, response, reply_markup=markup)
+            else:
+                bot.send_message(message.chat.id, 'Что-то пошло не так', reply_markup=markup)
 
-                cur = conn.cursor()
+                # conn = sqlite3.connect(r'db/database.db')
+                #
+                # cur = conn.cursor()
+                #
+                # cur.execute(f"""INSERT INTO lessons(lesson_id, name_lesson, answer) VALUES(
+                #     {index}, '{info[0]}', '{response}')"""
+                # )
+                #
+                # conn.commit()
 
-                cur.execute(f"""INSERT INTO lessons(lesson_id, name_lesson, answer) VALUES(
-                    {index}, '{info[0]}', '{response}')"""
-                )
-                conn.commit()
-
-        elif message.text[:6] == 'promt ':
+        elif message.text[:6] == 'prompt ':
             pass
         elif message.text.lower() == 'help':
             bot.send_message(message.chat.id, """

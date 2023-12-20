@@ -8,10 +8,10 @@ if __name__ == '__main__':
     cur = conn.cursor()
 
     cur.execute("""CREATE TABLE IF NOT EXISTS lessons(
-       lesson_id INT PRIMARY KEY,
-       name_lesson TEXT,
-       answer TEXT,
-    """)
+        lesson_id INT PRIMARY KEY,
+        name_lesson TEXT,
+        answer TEXT
+    )""")
     conn.commit()
 
 
