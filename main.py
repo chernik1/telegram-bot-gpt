@@ -12,6 +12,7 @@ if __name__ == '__main__':
         name_lesson TEXT,
         answer TEXT
     )""")
+
     conn.commit()
 
 
