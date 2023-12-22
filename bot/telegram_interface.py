@@ -52,9 +52,22 @@ def handle_message(message):
     global markup_config
 
     if message.content_type == 'text':
-        if message.text[:6] == 'prompt ' and len(message.text.split('***')) == 4:
-            pass
+        if message.text[:7] == 'answer ' and len(message.text.split('***')) == 2:
+            message.text = message.text[7:]
+            info = message.text.split('***')
+            lesson = info[0]
+            answer_id = int(info[1])
+
+            db = sqlite3.connect(r'db/database.db')
+            cur = db.cursor()
+            cur.execute(f"""SELECT answer FROM lessons WHERE name_lesson = '{lesson + "_" + str(answer_id)}'""")
+            answer = cur.fetchall()
+            db.close()
+
+            bot.send_message(message.chat.id, answer[0][0], reply_markup=markup)
+
         elif message.text[:7] == 'prompt ' and len(message.text.split('***')) == 3:
+
             message.text = message.text[7:]
             info = message.text.split('***')
             config.lesson = info[0]
@@ -67,20 +80,26 @@ def handle_message(message):
             status = responses_status[1]
 
             if status:
-                for response in responses:
+                for id, response in enumerate(responses, 1):
                     bot.send_message(message.chat.id, response, reply_markup=markup)
+
+                    db = sqlite3.connect(r'db/database.db')
+                    cur = db.cursor()
+
+                    existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
+                                                  (info[0] + '_',)).fetchone()
+
+                    if existing_lesson:
+                        print('Уже есть')
+                    else:
+                        # Выполните вставку новой записи
+                        cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
+                                    (info[0] + '_' + str(id), id, response))
+                        db.commit()
+
+                    db.close()
             else:
                 bot.send_message(message.chat.id, 'Что-то пошло не так', reply_markup=markup)
-
-                # conn = sqlite3.connect(r'db/database.db')
-                #
-                # cur = conn.cursor()
-                #
-                # cur.execute(f"""INSERT INTO lessons(lesson_id, name_lesson, answer) VALUES(
-                #     {index}, '{info[0]}', '{response}')"""
-                # )
-                #
-                # conn.commit()
 
         elif message.text[:6] == 'prompt ':
             pass
