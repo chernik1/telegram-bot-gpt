@@ -78,7 +78,6 @@ def handle_message(message):
 
             responses = responses_status[0]
             status = responses_status[1]
-
             if status:
                 for id, response in enumerate(responses, 1):
                     bot.send_message(message.chat.id, response, reply_markup=markup)
@@ -98,8 +97,20 @@ def handle_message(message):
                         db.commit()
 
                     db.close()
+        elif message.text[:7] == 'delete ' and len(message.text.split('***')) == 2:
+            message.text = message.text[7:]
+            info = message.text.split('***')
+            lesson = info[0]
+            prompt = info[1]
+            db = sqlite3.connect(r'db/database.db')
+            cur = db.cursor()
+            if prompt == 'all':
+                cur.execute(f"""DELETE FROM lessons WHERE name_lesson LIKE '{lesson}%'""")
             else:
-                bot.send_message(message.chat.id, 'Что-то пошло не так', reply_markup=markup)
+                cur.execute(f"""DELETE FROM lessons WHERE name_lesson = '{lesson + "_" + str(prompt)}'""")
+            db.commit()
+            db.close()
+            bot.send_message(message.chat.id, 'Удалено', reply_markup=markup)
 
         elif message.text[:6] == 'prompt ':
             pass
