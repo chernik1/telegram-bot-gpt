@@ -97,6 +97,25 @@ def handle_message(message):
                         db.commit()
 
                     db.close()
+            else:
+                bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
+        elif message.text[:7] == 'prompt ' and len(message.text.split('***')) == 2:
+            message.text = message.text[7:]
+            info = message.text.split('***')
+            tasks = info[0]
+            promt_constant = info[1]
+
+            responses_status = run_ai(config)
+            responses = responses_status[0]
+            status = responses_status[1]
+
+            if status:
+                for id, response in enumerate(responses, 1):
+                    bot.send_message(message.chat.id, str(id) + ' ' + response, reply_markup=markup)
+            else:
+                bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
+
+
         elif message.text[:7] == 'delete ' and len(message.text.split('***')) == 2:
             message.text = message.text[7:]
             info = message.text.split('***')
@@ -111,9 +130,6 @@ def handle_message(message):
             db.commit()
             db.close()
             bot.send_message(message.chat.id, 'Удалено', reply_markup=markup)
-
-        elif message.text[:6] == 'prompt ':
-            pass
         elif message.text.lower() == 'help':
             bot.send_message(message.chat.id, """
                     Help
