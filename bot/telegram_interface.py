@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 from config import Config
 import os
-from tools.pdf_form.logic import is_form_new_pdf
+# from tools.pdf_form.logic import is_form_new_pdf
 from tools.ai.logic import run_ai
 import re
 import sqlite3
@@ -171,24 +171,24 @@ def handle_message(message):
             config.db_action_for_lesson = False
             bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
 
-@bot.message_handler(content_types=['document'])
-def receive_document(message):
-    """Функция получения файла"""
-    global file_add
-    if message.caption:
-        flag = False
-        if flag:
-            file_info = bot.get_file(message.document.file_id)
-            downloaded_file = bot.download_file(file_info.file_path)
-            with open(f'{message.document.file_name}', 'wb') as new_file:
-                new_file.write(downloaded_file)
-
-            file_add = f'{message.document.file_name}'
-            file_format = file_add.split('.')[-1]
-            if file_format == 'pdf':
-                response = is_form_new_pdf(file_add, message.text)
-                for resp in response:
-                    bot.send_message(message.chat.id, resp, reply_markup=markup)
+# @bot.message_handler(content_types=['document'])
+# def receive_document(message):
+#     """Функция получения файла"""
+#     global file_add
+#     if message.caption:
+#         flag = False
+#         if flag:
+#             file_info = bot.get_file(message.document.file_id)
+#             downloaded_file = bot.download_file(file_info.file_path)
+#             with open(f'{message.document.file_name}', 'wb') as new_file:
+#                 new_file.write(downloaded_file)
+#
+#             file_add = f'{message.document.file_name}'
+#             file_format = file_add.split('.')[-1]
+#             if file_format == 'pdf':
+#                 response = is_form_new_pdf(file_add, message.text)
+#                 for resp in response:
+#                     bot.send_message(message.chat.id, resp, reply_markup=markup)
             # elif file_format == 'docx':
             #     response = is_form_new_docx(file_add, message.text)
             #     for resp in response:
@@ -199,7 +199,7 @@ def receive_document(message):
             #         bot.send_message(message.chat.id, resp, reply_markup=markup)
 
 
-    bot.reply_to(message, 'File received')
+    # bot.reply_to(message, 'File received')
 
 @bot.message_handler(content_types=['photo'])
 def receive_photo(message):
