@@ -14,7 +14,7 @@ async def make_prompt(prompt):
             messages=[{"role": "user", "content": prompt}],
         )
     except Exception as e:
-        print(e)
+        print(prompt)
         response = ['None']
     return response
 
@@ -60,16 +60,21 @@ async def start_ai(config: Config):
 
         all_repsonse = []
 
-        tasks = await create_tasks(prompt_list)
-        print(tasks)
+        split_tasks_10 = [prompt_list[i:i + 10] for i in range(0, len(prompt_list), 10)]
 
-        responses = await asyncio.gather(*tasks)
+        for count, prompt_list in enumerate(split_tasks_10, 1):
+            print(f'{count} / {len(split_tasks_10)}')
+            tasks = await create_tasks(prompt_list)
 
-        responses = [await validate_response(response) for response in responses]
+            responses = await asyncio.gather(*tasks)
+
+            responses = [await validate_response(response) for response in responses]
+
+            all_repsonse += responses
 
         status = True
 
-        return (responses, status)
+        return (all_repsonse, status)
     elif prompt != '':
         prompt = config.prompt
         response = await g4f.ChatCompletion.create_async(

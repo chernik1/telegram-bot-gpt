@@ -6,9 +6,9 @@ from typing import Any, Dict
 
 @dataclasses.dataclass
 class Config:
-    symbols: str = '2000'
+    symbols: str = '5000'
     # regex: str = r'\d{1,2}\..+?(?=\n|$)'
-    regex: str = r'\d{1,2}\..+?(?=\n|$)'
+    regex: str = r'(?:\d{1,3}\..+?)(?=\d{1,3}\.|$)'
     tasks: str = ''
     prompt_constant: str = 'Выполни запрос.'
     regex_prompt: str = ''

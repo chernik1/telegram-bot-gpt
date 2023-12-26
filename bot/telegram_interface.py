@@ -6,6 +6,7 @@ from tools.pdf_form.logic import is_form_new_pdf
 from tools.ai.logic import run_ai
 import re
 import sqlite3
+import time
 # from tools.ppt_form.logic import is_form_new_ppt
 # from tools.docx_form.logic import is_form_new_docx
 
@@ -19,6 +20,9 @@ config = Config()
 markup = None
 markup_config = None
 file_add = ''
+
+# Глобальная переменная для хранения текста из предыдущего сообщения
+previous_text = ''
 
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
@@ -45,11 +49,13 @@ def start(message):
 #         for resp in response:
 #             bot.send_message(message.chat.id, resp, reply_markup=markup)
 
+
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     """Функция обработки сообщений"""
     global config
     global markup_config
+    global previous_text
 
     if message.content_type == 'text':
         if config.db_action_for_lesson:
@@ -81,25 +87,30 @@ def handle_message(message):
 
             responses = responses_status[0]
             status = responses_status[1]
+            const_num = 73
             if status:
-                for id, response in enumerate(responses, 1):
-                    bot.send_message(message.chat.id, response, reply_markup=markup)
+                for id, response in enumerate(responses, const_num):
+                    # bot.send_message(message.chat.id, response, reply_markup=markup)
 
-                    db = sqlite3.connect(r'db/database.db')
-                    cur = db.cursor()
+                    with open(f'G:\\telegram-bot-gpt\\bot\\response_{id}.txt', 'a+', encoding='utf-8') as file:
+                        file.write(response)
 
-                    existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
-                                                  (info[0] + '_',)).fetchone()
-
-                    if existing_lesson:
-                        print('Уже есть')
-                    else:
-                        # Выполните вставку новой записи
-                        cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
-                                    (info[0] + '_' + str(id), id, response))
-                        db.commit()
-
-                    db.close()
+                    # db = sqlite3.connect(r'db/database.db')
+                    # cur = db.cursor()
+                    #
+                    # existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
+                    #                               (info[0] + '_',)).fetchone()
+                    #
+                    # if existing_lesson:
+                    #     print('Уже есть')
+                    # else:
+                    #     # Выполните вставку новой записи
+                    #     cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
+                    #                 (info[0] + '_' + str(id), id, response))
+                    #     db.commit()
+                    #
+                    # db.close()
+                bot.send_message(message.chat.id, 'Готово', reply_markup=markup)
             else:
                 bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
         elif message.text[:7] == 'prompt ' and len(message.text.split('***')) == 2:
