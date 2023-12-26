@@ -10,23 +10,17 @@ class Config:
     # regex: str = r'\d{1,2}\..+?(?=\n|$)'
     regex: str = r'\d{1,2}\..+?(?=\n|$)'
     tasks: str = ''
-    promt_constant: str = 'Выполни запрос.'
-    regex_promt: str = ''
+    prompt_constant: str = 'Выполни запрос.'
+    regex_prompt: str = ''
     file_format = 'pdf'
     lesson = 'base'
+    prompt = ''
+    db_action_for_lesson: bool = False
+
     def __str__(self):
-        return 'symbols: ' + self.symbols + '\n' + 'regex: ' + self.regex + '\n' + 'promt: ' + self.promt + '\n' + 'tasks: ' + self.tasks + '\n' + 'promt_constant: ' + self.promt_constant + '\n' + 'regex_promt: ' + self.regex_promt
+        return 'symbols: ' + self.symbols + '\n' + 'regex: ' + self.regex + '\n' + 'promt: ' + self.prompt + '\n' + 'tasks: ' + self.tasks + '\n' + 'promt_constant: ' + self.prompt_constant + '\n' + 'regex_promt: ' + self.regex_prompt
 
 
-@dataclasses.dataclass
-class ConfigOneMessage(Config):
-    promt: str = ''
-    regex_tasks = ''
-    regex_promt = ''
-
-@dataclasses.dataclass
-class ConfigConstructor(Config):
-    pass
 
 @dataclasses.dataclass
 class Lesson:

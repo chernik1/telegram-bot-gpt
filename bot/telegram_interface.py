@@ -1,6 +1,6 @@
 import telebot
 from telebot import types
-from config import Config, ConfigConstructor, ConfigOneMessage
+from config import Config
 import os
 from tools.pdf_form.logic import is_form_new_pdf
 from tools.ai.logic import run_ai
@@ -14,7 +14,7 @@ import sqlite3
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
 # Конфиг
-config = ConfigConstructor()
+config = Config()
 
 markup = None
 markup_config = None
@@ -52,6 +52,9 @@ def handle_message(message):
     global markup_config
 
     if message.content_type == 'text':
+        if config.db_action_for_lesson:
+            pass
+
         if message.text[:7] == 'answer ' and len(message.text.split('***')) == 2:
             message.text = message.text[7:]
             info = message.text.split('***')
@@ -72,7 +75,7 @@ def handle_message(message):
             info = message.text.split('***')
             config.lesson = info[0]
             config.tasks = info[1]
-            config.promt_constant = info[2]
+            config.prompt_constant = info[2]
 
             responses_status = run_ai(config)
 
@@ -103,7 +106,7 @@ def handle_message(message):
             message.text = message.text[7:]
             info = message.text.split('***')
             tasks = info[0]
-            promt_constant = info[1]
+            prompt_constant = info[1]
 
             responses_status = run_ai(config)
             responses = responses_status[0]
@@ -133,9 +136,22 @@ def handle_message(message):
         elif message.text.lower() == 'help':
             bot.send_message(message.chat.id, """
                     Help
-Обычный запрос - promt tasks***promt_constant
-Запрос о предмете - promt lesson***tasks***promt_constant
+Обычный запрос - prompt tasks***prompt_constant
+Запрос о предмете - prompt lesson***tasks***prompt_constant
+Удаление запроса - delete lesson***prompt
+Получить вопрос для определенного предмета - action lesson
+Остановить запрос для определенного предмета - clear action
             """, reply_markup=markup)
+            bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
+        elif message.text.lower()[:8] == 'action ':
+            message.text = message.text[8:]
+            info = message.text.split()
+            config.db_action_for_lesson = True
+            config.lesson = info[0]
+            bot.send_message(message.chat.id, f'Запрос для {config.lesson} установлен', reply_markup=markup)
+        elif message.text.lower() == 'clear action':
+            config.db_action_for_lesson = False
+            bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
 
 @bot.message_handler(content_types=['document'])
 def receive_document(message):

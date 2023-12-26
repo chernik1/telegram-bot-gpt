@@ -6,23 +6,23 @@ from threading import Thread
 from queue import Queue
 from config import Config
 
-async def make_promt(promt):
+async def make_prompt(prompt):
     try:
         response = await g4f.ChatCompletion.create_async(
             model=g4f.models.default,
             provider=g4f.Provider.Bing,
-            messages=[{"role": "user", "content": promt}],
+            messages=[{"role": "user", "content": prompt}],
         )
     except Exception as e:
         print(e)
         response = ['None']
     return response
 
-async def create_tasks(promt_list):
+async def create_tasks(prompt_list):
     tasks = []
-    for index, promt in enumerate(promt_list):
+    for index, prompt in enumerate(prompt_list):
 
-        task = asyncio.create_task(make_promt(promt))
+        task = asyncio.create_task(make_prompt(prompt))
         tasks.append(task)
 
     return tasks
@@ -45,31 +45,22 @@ async def validate_response(response):
 
 
 async def start_ai(config: Config):
-    #promt_user = re.match(r'...+', promt_all, re.DOTALL)
-    # with open(r'G:\telegram-bot-gpt\ai\question.txt', 'r', encoding='utf-8') as file:
-    #     question = file.read()
-    #     regex = re.compile(r'\d.+')
-    #     split_promt = re.findall(regex, question)
-    #     if len(split_promt) == 0:
-    #         raise SyntaxError('Ничего не нашлось под регулярное выражение')
-
-    # promt = config.promt.strip()
-    promt = ''
+    prompt = config.prompt
     symbols = config.symbols.strip()
     regex = config.regex.strip()
     tasks = config.tasks.strip()
-    promt_constant = config.promt_constant.strip()
+    prompt_constant = config.prompt_constant.strip()
 
-    if promt == '' and tasks != '' and promt_constant != '' and regex != '':
+    if prompt == '' and tasks != '' and prompt_constant != '' and regex != '':
 
 
-        split_promt = re.findall(regex, tasks, re.DOTALL | re.I)
+        split_prompt = re.findall(regex, tasks, re.DOTALL | re.I)
 
-        promt_list = [promt + ' ' + promt_constant + ' ' + f' Лимит символов не должен превышать {symbols}' for promt in split_promt]
+        prompt_list = [prompt + ' ' + prompt_constant + ' ' + f' Лимит символов не должен превышать {symbols}' for prompt in split_prompt]
 
         all_repsonse = []
 
-        tasks = await create_tasks(promt_list)
+        tasks = await create_tasks(prompt_list)
         print(tasks)
 
         responses = await asyncio.gather(*tasks)
@@ -79,26 +70,26 @@ async def start_ai(config: Config):
         status = True
 
         return (responses, status)
-    elif promt != '':
-        promt = config.promt
+    elif prompt != '':
+        prompt = config.prompt
         response = await g4f.ChatCompletion.create_async(
             model=g4f.models.default,
             provider=g4f.Provider.Bing,
-            messages=[{"role": "user", "content": promt}],
+            messages=[{"role": "user", "content": prompt}],
         )
         return response
     else:
         status = False
         return (None, status)
 
-def run_ai(promt_user=None):
+def run_ai(prompt_user=None):
     time_start = time.time()
     result_queue = Queue()
     print(time_start)
     def run_async_code():
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        result = loop.run_until_complete(start_ai(promt_user))
+        result = loop.run_until_complete(start_ai(prompt_user))
         loop.close()
         result_queue.put(result)
 
