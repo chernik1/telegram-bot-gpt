@@ -12,6 +12,9 @@ import time
 
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
+import string
+
+alphabet = string.ascii_lowercase
 # Конфиг
 config = Config()
 
@@ -56,7 +59,7 @@ def handle_message(message):
     global previous_text
 
     if message.content_type == 'text':
-        if config.db_action_for_lesson:
+        if config.db_action_for_lesson and any(not char.isalpha() or char.lower() not in alphabet for char in message.text):
             list_numbers = message.text.split()
             time.sleep(10)
             for i in range(len(list_numbers)):
