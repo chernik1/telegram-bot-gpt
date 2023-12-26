@@ -10,8 +10,6 @@ import time
 # from tools.ppt_form.logic import is_form_new_ppt
 # from tools.docx_form.logic import is_form_new_docx
 
-# ToDo: вывод
-
 bot = telebot.TeleBot('6417218112:AAEQmNzdBVw9fpVAXFAjqwjIvcDUtH93Xt8')
 
 # Конфиг
