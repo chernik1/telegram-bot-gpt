@@ -59,9 +59,15 @@ def handle_message(message):
 
     if message.content_type == 'text':
         if config.db_action_for_lesson:
-            pass
-
-        if message.text[:7] == 'answer ' and len(message.text.split('***')) == 2:
+            list_numbers = message.text.split()
+            time.sleep(10)
+            for i in range(len(list_numbers)):
+                with open(f'bot/response_{list_numbers[i]}.txt', 'r', encoding='utf-8') as file:
+                    response_full = file.read()
+                response__split_3999 = [response_full[i:i + 3888] for i in range(0, len(response_full), 3888)]
+                for response in response__split_3999:
+                    bot.send_message(message.chat.id, str(list_numbers[i]) + response, reply_markup=markup)
+        elif message.text[:7] == 'answer ' and len(message.text.split('***')) == 2:
             message.text = message.text[7:]
             info = message.text.split('***')
             lesson = info[0]
@@ -154,8 +160,8 @@ def handle_message(message):
 Остановить запрос для определенного предмета - clear action
             """, reply_markup=markup)
             bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
-        elif message.text.lower()[:8] == 'action ':
-            message.text = message.text[8:]
+        elif message.text.lower()[:7] == 'action ':
+            message.text = message.text[7:]
             info = message.text.split()
             config.db_action_for_lesson = True
             config.lesson = info[0]
