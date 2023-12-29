@@ -68,7 +68,7 @@ def handle_message(message):
                 response__split_3999 = [response_full[i:i + 3888] for i in range(0, len(response_full), 3888)]
                 for response in response__split_3999:
                     bot.send_message(message.chat.id, str(list_numbers[i]) + response, reply_markup=markup)
-        elif message.text[:7] == 'answer ' and len(message.text.split('***')) == 2:
+        elif message.text[:4] == 'ans ' and len(message.text.split('***')) == 2:
             message.text = message.text[7:]
             info = message.text.split('***')
             lesson = info[0]
@@ -82,7 +82,7 @@ def handle_message(message):
 
             bot.send_message(message.chat.id, answer[0][0], reply_markup=markup)
 
-        elif message.text[:7] == 'prompt ' and len(message.text.split('***')) == 3:
+        elif message.text[:3] == 'pr ' and len(message.text.split('***')) == 3:
 
             message.text = message.text[7:]
             info = message.text.split('***')
@@ -97,7 +97,6 @@ def handle_message(message):
             const_num = 73
             if status:
                 for id, response in enumerate(responses, const_num):
-                    # bot.send_message(message.chat.id, response, reply_markup=markup)
 
                     with open(f'G:\\telegram-bot-gpt\\bot\\response_{id}.txt', 'a+', encoding='utf-8') as file:
                         file.write(response)
@@ -117,10 +116,11 @@ def handle_message(message):
                     #     db.commit()
                     #
                     # db.close()
+
                 bot.send_message(message.chat.id, 'Готово', reply_markup=markup)
             else:
                 bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
-        elif message.text[:7] == 'prompt ' and len(message.text.split('***')) == 2:
+        elif message.text[:3] == 'pr ' and len(message.text.split('***')) == 2:
             message.text = message.text[7:]
             info = message.text.split('***')
             tasks = info[0]
@@ -137,7 +137,7 @@ def handle_message(message):
                 bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
 
 
-        elif message.text[:7] == 'delete ' and len(message.text.split('***')) == 2:
+        elif message.text[:4] == 'del ' and len(message.text.split('***')) == 2:
             message.text = message.text[7:]
             info = message.text.split('***')
             lesson = info[0]
@@ -154,9 +154,9 @@ def handle_message(message):
         elif message.text.lower() == 'help':
             bot.send_message(message.chat.id, """
                     Help
-Обычный запрос - prompt tasks***prompt_constant
-Запрос о предмете - prompt lesson***tasks***prompt_constant
-Удаление запроса - delete lesson***prompt
+Обычный запрос - pr tasks***prompt_constant
+Запрос о предмете - pr lesson***tasks***prompt_constant
+Удаление запроса - del lesson***prompt
 Получить вопрос для определенного предмета - action lesson
 Остановить запрос для определенного предмета - clear action
             """, reply_markup=markup)
