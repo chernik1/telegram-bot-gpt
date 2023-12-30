@@ -69,6 +69,7 @@ def handle_message(message):
                 for response in response__split_3999:
                     bot.send_message(message.chat.id, str(list_numbers[i]) + response, reply_markup=markup)
         elif message.text[:4] == 'ans ' and len(message.text.split('***')) == 2:
+            #ToDo испавить
             message.text = message.text[7:]
             info = message.text.split('***')
             lesson = info[0]
@@ -94,28 +95,26 @@ def handle_message(message):
 
             responses = responses_status[0]
             status = responses_status[1]
-            const_num = 73
+            const_num = 1
             if status:
                 for id, response in enumerate(responses, const_num):
 
-                    with open(f'G:\\telegram-bot-gpt\\bot\\response_{id}.txt', 'a+', encoding='utf-8') as file:
-                        file.write(response)
 
-                    # db = sqlite3.connect(r'db/database.db')
-                    # cur = db.cursor()
-                    #
-                    # existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
-                    #                               (info[0] + '_',)).fetchone()
-                    #
-                    # if existing_lesson:
-                    #     print('Уже есть')
-                    # else:
-                    #     # Выполните вставку новой записи
-                    #     cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
-                    #                 (info[0] + '_' + str(id), id, response))
-                    #     db.commit()
-                    #
-                    # db.close()
+                    db = sqlite3.connect(r'db/database.db')
+                    cur = db.cursor()
+
+                    existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
+                                                  (info[0] + '_',)).fetchone()
+
+                    if existing_lesson:
+                        print('Уже есть')
+                    else:
+                        # Выполните вставку новой записи
+                        cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
+                                    (info[0] + '_' + str(id), id, response))
+                        db.commit()
+
+                    db.close()
 
                 bot.send_message(message.chat.id, 'Готово', reply_markup=markup)
             else:
