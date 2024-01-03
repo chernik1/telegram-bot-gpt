@@ -72,28 +72,31 @@ def handle_message(message):
 
             responses = responses_status[0]
             status = responses_status[1]
+            answer = responses_status[2]
             const_num = 1
             if status:
                 for id, response in enumerate(responses, const_num):
 
+                    with open(f'bot/{id}.txt', 'w', encoding='utf-8') as file:
+                        file.write(response)
 
-                    db = sqlite3.connect(r'db/database.db')
-                    cur = db.cursor()
+                    # db = sqlite3.connect(r'db/database.db')
+                    # cur = db.cursor()
+                    #
+                    # existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
+                    #                               (info[0] + '_',)).fetchone()
+                    #
+                    # if existing_lesson:
+                    #     print('Уже есть')
+                    # else:
+                    #     # Выполните вставку новой записи
+                    #     cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
+                    #                 (info[0] + '_' + str(id), id, response))
+                    #     db.commit()
+                    #
+                    # db.close()
 
-                    existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
-                                                  (info[0] + '_',)).fetchone()
-
-                    if existing_lesson:
-                        print('Уже есть')
-                    else:
-                        # Выполните вставку новой записи
-                        cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
-                                    (info[0] + '_' + str(id), id, response))
-                        db.commit()
-
-                    db.close()
-
-                bot.send_message(message.chat.id, 'Готово', reply_markup=markup)
+                bot.send_message(message.chat.id, 'Готово')
             else:
                 bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
         elif message.text[:3] == 'pr ' and len(message.text.split('***')) == 2:

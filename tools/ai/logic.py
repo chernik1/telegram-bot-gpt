@@ -74,7 +74,7 @@ async def start_ai(config: Config):
 
         status = True
 
-        return (all_repsonse, status)
+        return (all_repsonse, status, prompt_list)
     elif prompt != '':
         prompt = config.prompt
         response = await g4f.ChatCompletion.create_async(
