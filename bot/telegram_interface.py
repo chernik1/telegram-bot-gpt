@@ -73,7 +73,7 @@ def handle_message(message):
             responses = responses_status[0]
             status = responses_status[1]
             answer = responses_status[2]
-            const_num = 1
+            const_num = 39
             if status:
                 for id, response in enumerate(responses, const_num):
 
