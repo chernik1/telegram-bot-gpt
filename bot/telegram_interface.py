@@ -16,6 +16,8 @@ alphabet = string.ascii_lowercase
 # Конфиг
 config = Config()
 
+markup = types.ReplyKeyboardMarkup()
+
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
     """Функция запуска интерфейса для пользователя"""
@@ -80,21 +82,21 @@ def handle_message(message):
                     with open(f'bot/{id}.txt', 'w', encoding='utf-8') as file:
                         file.write(response)
 
-                    # db = sqlite3.connect(r'db/database.db')
-                    # cur = db.cursor()
-                    #
-                    # existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
-                    #                               (info[0] + '_',)).fetchone()
-                    #
-                    # if existing_lesson:
-                    #     print('Уже есть')
-                    # else:
-                    #     # Выполните вставку новой записи
-                    #     cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
-                    #                 (info[0] + '_' + str(id), id, response))
-                    #     db.commit()
-                    #
-                    # db.close()
+                    db = sqlite3.connect(r'db/database.db')
+                    cur = db.cursor()
+
+                    existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
+                                                  (info[0] + '_',)).fetchone()
+
+                    if existing_lesson:
+                        print('Уже есть')
+                    else:
+                        # Выполните вставку новой записи
+                        cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
+                                    (info[0] + '_' + str(id), id, response))
+                        db.commit()
+
+                    db.close()
 
                 bot.send_message(message.chat.id, 'Готово')
             else:
