@@ -34,7 +34,7 @@ def handle_message(message):
     global config
 
     if message.content_type == 'text':
-        if config.db_action_for_lesson and any(not char.isalpha() or char.lower() not in alphabet for char in message.text):
+        if config.db_action_for_pack and any(not char.isalpha() or char.lower() not in alphabet for char in message.text):
             list_numbers = message.text.split()
             time.sleep(10)
             for i in range(len(list_numbers)):
@@ -47,9 +47,9 @@ def handle_message(message):
                 bot.send_message(message.chat.id, """
                             Help
         Обычный запрос - /prompt или /pr tasks***prompt_constant
-        Запрос о предмете - /prompt или /pr lesson***tasks***prompt_constant
-        Удаление запроса - /delete или /del lesson***prompt
-        Получить вопрос для определенного предмета - /action или /act lesson
+        Запрос о предмете - /prompt или /pr pack***tasks***prompt_constant
+        Удаление запроса - /delete или /del pack***prompt
+        Получить вопрос для определенного предмета - /action или /act pack
         Остановить запрос для определенного предмета - /cl ac или /clear action
         Конфигурация - /config
                     """, reply_markup=markup)
@@ -57,12 +57,12 @@ def handle_message(message):
         elif (message.text[:4] == '/ans' or message.text[:7] == '/answer') and len(message.text.split('***')) == 2:
             message.text = message.text[4:]
             info = message.text.split('***')
-            lesson = info[0]
+            name_pack = info[0]
             answer_id = int(info[1])
 
             db = sqlite3.connect(r'db/database.db')
             cur = db.cursor()
-            cur.execute(f"""SELECT answer FROM lessons WHERE name_lesson = '{lesson + "_" + str(answer_id)}'""")
+            cur.execute(f"""SELECT answer FROM pack WHERE name_pack = '{name_pack + "_" + str(answer_id)}'""")
             answer = cur.fetchall()
             db.close()
 
@@ -72,7 +72,7 @@ def handle_message(message):
 
             message.text = message.text[3:]
             info = message.text.split('***')
-            config.lesson = info[0]
+            config.name_pack = info[0]
             config.tasks = info[1]
             config.prompt_constant = info[2]
 
@@ -81,25 +81,22 @@ def handle_message(message):
             responses = responses_status[0]
             status = responses_status[1]
             answer = responses_status[2]
-            const_num = 39
+            const_num = 1
             if status:
                 for id, response in enumerate(responses, const_num):
-
-                    with open(f'bot/{id}.txt', 'w', encoding='utf-8') as file:
-                        file.write(response)
 
                     db = sqlite3.connect(r'db/database.db')
                     cur = db.cursor()
 
-                    existing_lesson = cur.execute(f"""SELECT name_lesson FROM lessons WHERE name_lesson = ?""",
+                    existing_name_pack = cur.execute(f"""SELECT name_pack FROM pack WHERE name_pack = ?""",
                                                   (info[0] + '_',)).fetchone()
 
-                    if existing_lesson:
+                    if existing_name_pack:
                         print('Уже есть')
                     else:
                         # Выполните вставку новой записи
-                        cur.execute(f"""INSERT INTO lessons(name_lesson, id_question, answer) VALUES(?, ?, ?)""",
-                                    (info[0] + '_' + str(id), id, response))
+                        cur.execute(f"""INSERT INTO pack(name_pack, answer) VALUES(?, ?)""",
+                                    (info[0] + '_' + str(id), response))
                         db.commit()
 
                     db.close()
@@ -125,25 +122,25 @@ def handle_message(message):
         elif (message.text[:4] == '/del' or message.text[:7] == '/delete') and len(message.text.split('***')) == 2:
             message.text = message.text[4:]
             info = message.text.split('***')
-            lesson = info[0]
+            name_pack = info[0]
             prompt = info[1]
             db = sqlite3.connect(r'db/database.db')
             cur = db.cursor()
             if prompt == 'all':
-                cur.execute(f"""DELETE FROM lessons WHERE name_lesson LIKE '{lesson}%'""")
+                cur.execute(f"""DELETE FROM pack WHERE name_pack LIKE '{name_pack}%'""")
             else:
-                cur.execute(f"""DELETE FROM lessons WHERE name_lesson = '{lesson + "_" + str(prompt)}'""")
+                cur.execute(f"""DELETE FROM pack WHERE name_pack = '{name_pack + "_" + str(prompt)}'""")
             db.commit()
             db.close()
             bot.send_message(message.chat.id, 'Удалено', reply_markup=markup)
         elif message.text.lower()[:4] == '/act' or message.text.lower()[:7] == '/action':
             message.text = message.text[7:]
             info = message.text.split()
-            config.db_action_for_lesson = True
-            config.lesson = info[0]
-            bot.send_message(message.chat.id, f'Запрос для {config.lesson} установлен', reply_markup=markup)
+            config.db_action_for_pack = True
+            config.name_pack = info[0]
+            bot.send_message(message.chat.id, f'Запрос для {config.name_pack} установлен', reply_markup=markup)
         elif message.text.lower() == '/clear action' or message.text.lower() == '/cl ac':
-            config.db_action_for_lesson = False
+            config.db_action_for_pack = False
             bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
         elif message.text.lower() == '/config':
             bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
@@ -151,6 +148,7 @@ def handle_message(message):
 def start_bot():
     """Функция запуска бота"""
     global config, markup
+
     # Конфиг
     config = Config()
 

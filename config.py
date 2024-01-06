@@ -11,10 +11,9 @@ class Config:
     tasks: str = ''
     prompt_constant: str = 'Выполни задачу.'
     regex_prompt: str = ''
-    file_format = 'pdf'
-    lesson = 'base'
     prompt = ''
-    db_action_for_lesson: bool = False
+    name_pack = 'base'
+    db_action_for_pack: bool = False
 
     def __str__(self):
         return 'symbols: ' + self.symbols + '\n' + 'regex: ' + self.regex + '\n' + 'promt: ' + self.prompt + '\n' + 'tasks: ' + self.tasks + '\n' + 'promt_constant: ' + self.prompt_constant + '\n' + 'regex_promt: ' + self.regex_prompt

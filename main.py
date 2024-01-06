@@ -7,9 +7,8 @@ if __name__ == '__main__':
 
     cur = conn.cursor()
 
-    cur.execute("""CREATE TABLE IF NOT EXISTS lessons(
-        name_lesson TEXT PRIMARY KEY,
-        id_question INTEGER,
+    cur.execute("""CREATE TABLE IF NOT EXISTS pack(
+        name_pack TEXT PRIMARY KEY,
         answer TEXT
     )""")
 
