@@ -13,11 +13,6 @@ import string
 
 alphabet = string.ascii_lowercase
 
-# Конфиг
-config = Config()
-
-markup = types.ReplyKeyboardMarkup()
-
 @bot.message_handler(commands=['start', 'main'])
 def start(message):
     """Функция запуска интерфейса для пользователя"""
@@ -48,7 +43,18 @@ def handle_message(message):
                 response__split_3999 = [response_full[i:i + 3888] for i in range(0, len(response_full), 3888)]
                 for response in response__split_3999:
                     bot.send_message(message.chat.id, str(list_numbers[i]) + response, reply_markup=markup)
-        elif message.text[:4] == 'ans ' and len(message.text.split('***')) == 2:
+        elif message.text.lower() == 'help':
+                bot.send_message(message.chat.id, """
+                            Help
+        Обычный запрос - /prompt или /pr tasks***prompt_constant
+        Запрос о предмете - /prompt или /pr lesson***tasks***prompt_constant
+        Удаление запроса - /delete или /del lesson***prompt
+        Получить вопрос для определенного предмета - /action или /act lesson
+        Остановить запрос для определенного предмета - /cl ac или /clear action
+        Конфигурация - /config
+                    """, reply_markup=markup)
+                bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
+        elif (message.text[:4] == '/ans' or message.text[:7] == '/answer') and len(message.text.split('***')) == 2:
             message.text = message.text[4:]
             info = message.text.split('***')
             lesson = info[0]
@@ -62,7 +68,7 @@ def handle_message(message):
 
             bot.send_message(message.chat.id, answer[0][0], reply_markup=markup)
 
-        elif message.text[:3] == 'pr ' and len(message.text.split('***')) == 3:
+        elif (message.text[:3] == '/pr' or message.text[:7] == '/prompt') and len(message.text.split('***')) == 3:
 
             message.text = message.text[3:]
             info = message.text.split('***')
@@ -101,7 +107,7 @@ def handle_message(message):
                 bot.send_message(message.chat.id, 'Готово')
             else:
                 bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
-        elif message.text[:3] == 'pr ' and len(message.text.split('***')) == 2:
+        elif (message.text[:3] == '/pr' or message.text[:7] == '/prompt') and len(message.text.split('***')) == 2:
             message.text = message.text[3:]
             info = message.text.split('***')
             tasks = info[0]
@@ -116,9 +122,7 @@ def handle_message(message):
                     bot.send_message(message.chat.id, str(id) + ' ' + response, reply_markup=markup)
             else:
                 bot.send_message(message.chat.id, 'Ошибка', reply_markup=markup)
-
-
-        elif message.text[:4] == 'del ' and len(message.text.split('***')) == 2:
+        elif (message.text[:4] == '/del' or message.text[:7] == '/delete') and len(message.text.split('***')) == 2:
             message.text = message.text[4:]
             info = message.text.split('***')
             lesson = info[0]
@@ -132,30 +136,21 @@ def handle_message(message):
             db.commit()
             db.close()
             bot.send_message(message.chat.id, 'Удалено', reply_markup=markup)
-        elif message.text.lower() == 'help':
-            bot.send_message(message.chat.id, """
-                    Help
-Обычный запрос - /prompt или /pr tasks***prompt_constant
-Запрос о предмете - /prompt или /pr lesson***tasks***prompt_constant
-Удаление запроса - /delete или /del lesson***prompt
-Получить вопрос для определенного предмета - /action или /act lesson
-Остановить запрос для определенного предмета - /clear или /cl action
-            """, reply_markup=markup)
-            bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
-        elif message.text.lower()[:7] == 'action ':
+        elif message.text.lower()[:4] == '/act' or message.text.lower()[:7] == '/action':
             message.text = message.text[7:]
             info = message.text.split()
             config.db_action_for_lesson = True
             config.lesson = info[0]
             bot.send_message(message.chat.id, f'Запрос для {config.lesson} установлен', reply_markup=markup)
-        elif message.text.lower() == 'clear action':
+        elif message.text.lower() == '/clear action' or message.text.lower() == '/cl ac':
             config.db_action_for_lesson = False
             bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
-        elif bot.text.lower()[:7] == 'config ':
+        elif message.text.lower() == '/config':
             bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
 
 def start_bot():
     """Функция запуска бота"""
+    global config, markup
     # Конфиг
     config = Config()
 
