@@ -24,19 +24,19 @@ def start(message):
     global markup
     markup = types.ReplyKeyboardMarkup()
 
-    btn1 = types.KeyboardButton('help')
+    btn1 = types.KeyboardButton('/help')
+    btn2 = types.KeyboardButton('/config')
 
     markup.add(btn1)
 
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, handle_message)
 
+
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
     """Функция обработки сообщений"""
     global config
-    global markup_config
-    global previous_text
 
     if message.content_type == 'text':
         if config.db_action_for_lesson and any(not char.isalpha() or char.lower() not in alphabet for char in message.text):
@@ -135,11 +135,11 @@ def handle_message(message):
         elif message.text.lower() == 'help':
             bot.send_message(message.chat.id, """
                     Help
-Обычный запрос - pr tasks***prompt_constant
-Запрос о предмете - pr lesson***tasks***prompt_constant
-Удаление запроса - del lesson***prompt
-Получить вопрос для определенного предмета - action lesson
-Остановить запрос для определенного предмета - clear action
+Обычный запрос - /prompt или /pr tasks***prompt_constant
+Запрос о предмете - /prompt или /pr lesson***tasks***prompt_constant
+Удаление запроса - /delete или /del lesson***prompt
+Получить вопрос для определенного предмета - /action или /act lesson
+Остановить запрос для определенного предмета - /clear или /cl action
             """, reply_markup=markup)
             bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
         elif message.text.lower()[:7] == 'action ':
@@ -151,19 +151,15 @@ def handle_message(message):
         elif message.text.lower() == 'clear action':
             config.db_action_for_lesson = False
             bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
-
-@bot.message_handler(content_types=['photo'])
-def receive_photo(message):
-    """Функция получения фото"""
-    file_info = bot.get_file(message.photo[-1].file_id)
-    downloaded_file = bot.download_file(file_info.file_path)
-
-    with open(rf'{1}', 'wb') as new_file:
-        new_file.write(downloaded_file)
-
-    bot.reply_to(message, 'Photo received')
+        elif bot.text.lower()[:7] == 'config ':
+            bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
 
 def start_bot():
     """Функция запуска бота"""
+    # Конфиг
+    config = Config()
+
+    markup = types.ReplyKeyboardMarkup()
     bot.polling(none_stop=True)
+
 
