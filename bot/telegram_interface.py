@@ -21,8 +21,7 @@ def start(message):
 
     btn1 = types.KeyboardButton('/help')
     btn2 = types.KeyboardButton('/config')
-
-    markup.add(btn1)
+    markup.add(btn1, btn2)
 
     bot.send_message(message.chat.id, f'Hello, {message.from_user.first_name}!', reply_markup=markup)
     bot.register_next_step_handler(message, handle_message)
@@ -34,7 +33,7 @@ def handle_message(message):
     global config
 
     if message.content_type == 'text':
-        if config.db_action_for_pack and any(not char.isalpha() or char.lower() not in alphabet for char in message.text):
+        if config.db_action_for_multitask and any(not char.isalpha() or char.lower() not in alphabet for char in message.text):
             list_numbers = message.text.split()
             time.sleep(10)
             for i in range(len(list_numbers)):
@@ -51,18 +50,18 @@ def handle_message(message):
         Удаление запроса - /delete или /del pack***prompt
         Получить вопрос для определенного предмета - /action или /act pack
         Остановить запрос для определенного предмета - /cl ac или /clear action
-        Конфигурация - /config
+        Конфигурация - /config или /cfg
                     """, reply_markup=markup)
                 bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
         elif (message.text[:4] == '/ans' or message.text[:7] == '/answer') and len(message.text.split('***')) == 2:
             message.text = message.text[4:]
             info = message.text.split('***')
-            name_pack = info[0]
+            name_multitask = info[0]
             answer_id = int(info[1])
 
             db = sqlite3.connect(r'db/database.db')
             cur = db.cursor()
-            cur.execute(f"""SELECT answer FROM pack WHERE name_pack = '{name_pack + "_" + str(answer_id)}'""")
+            cur.execute(f"""SELECT answer FROM multitask WHERE name_multitask = '{name_multitask + "_" + str(answer_id)}'""")
             answer = cur.fetchall()
             db.close()
 
@@ -88,14 +87,14 @@ def handle_message(message):
                     db = sqlite3.connect(r'db/database.db')
                     cur = db.cursor()
 
-                    existing_name_pack = cur.execute(f"""SELECT name_pack FROM pack WHERE name_pack = ?""",
+                    existing_name_pack = cur.execute(f"""SELECT name_pack FROM multitask WHERE name_multitask = ?""",
                                                   (info[0] + '_',)).fetchone()
 
                     if existing_name_pack:
                         print('Уже есть')
                     else:
                         # Выполните вставку новой записи
-                        cur.execute(f"""INSERT INTO pack(name_pack, answer) VALUES(?, ?)""",
+                        cur.execute(f"""INSERT INTO pack(name_multitask, answer) VALUES(?, ?)""",
                                     (info[0] + '_' + str(id), response))
                         db.commit()
 
@@ -122,14 +121,14 @@ def handle_message(message):
         elif (message.text[:4] == '/del' or message.text[:7] == '/delete') and len(message.text.split('***')) == 2:
             message.text = message.text[4:]
             info = message.text.split('***')
-            name_pack = info[0]
+            name_multitask = info[0]
             prompt = info[1]
             db = sqlite3.connect(r'db/database.db')
             cur = db.cursor()
             if prompt == 'all':
-                cur.execute(f"""DELETE FROM pack WHERE name_pack LIKE '{name_pack}%'""")
+                cur.execute(f"""DELETE FROM multitask WHERE name_multitask LIKE '{name_multitask}%'""")
             else:
-                cur.execute(f"""DELETE FROM pack WHERE name_pack = '{name_pack + "_" + str(prompt)}'""")
+                cur.execute(f"""DELETE FROM multitask WHERE name_multitask = '{name_multitask + "_" + str(prompt)}'""")
             db.commit()
             db.close()
             bot.send_message(message.chat.id, 'Удалено', reply_markup=markup)
@@ -142,17 +141,16 @@ def handle_message(message):
         elif message.text.lower() == '/clear action' or message.text.lower() == '/cl ac':
             config.db_action_for_pack = False
             bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
-        elif message.text.lower() == '/config':
+        elif message.text.lower() == '/config' or message.text.lower() == '/cfg':
             bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
 
 def start_bot():
     """Функция запуска бота"""
     global config, markup
 
-    # Конфиг
     config = Config()
-
     markup = types.ReplyKeyboardMarkup()
+
     bot.polling(none_stop=True)
 
 

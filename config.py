@@ -12,7 +12,7 @@ class Config:
     prompt_constant: str = 'Выполни задачу.'
     regex_prompt: str = ''
     prompt = ''
-    name_pack = 'base'
+    name_multitask = 'base'
     db_action_for_pack: bool = False
 
     def __str__(self):
