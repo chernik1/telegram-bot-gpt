@@ -51,6 +51,7 @@ def handle_message(message):
         Получить вопрос для определенного предмета - /action или /act pack
         Остановить запрос для определенного предмета - /cl ac или /clear action
         Конфигурация - /config или /cfg
+        Установить regex - /set regex выражение
                     """, reply_markup=markup)
                 bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
         elif (message.text[:4] == '/ans' or message.text[:7] == '/answer') and len(message.text.split('***')) == 2:
@@ -67,7 +68,7 @@ def handle_message(message):
 
             bot.send_message(message.chat.id, answer[0][0], reply_markup=markup)
 
-        elif (message.text[:3] == '/pr' or message.text[:7] == '/prompt') and len(message.text.split('***')) == 3:
+        elif (message.text[:3] == '/pr' or message.text[:7] == '/prompt') and len(message.text.split('***')) == 3 and not config.flag_question:
 
             message.text = message.text[3:]
             info = message.text.split('***')
@@ -94,8 +95,8 @@ def handle_message(message):
                         print('Уже есть')
                     else:
                         # Выполните вставку новой записи
-                        cur.execute(f"""INSERT INTO pack(name_multitask, answer) VALUES(?, ?)""",
-                                    (info[0] + '_' + str(id), response))
+                        cur.execute(f"""INSERT INTO pack(name_multitask, answer, question) VALUES(?, ?, ?)""",
+                                    (info[0] + '_' + str(id), response, answer))
                         db.commit()
 
                     db.close()
@@ -143,6 +144,13 @@ def handle_message(message):
             bot.send_message(message.chat.id, f'Запрос очищен', reply_markup=markup)
         elif message.text.lower() == '/config' or message.text.lower() == '/cfg':
             bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
+        elif message.text.lower() == '/set regex':
+            message.text = message.text[10:].strip()
+            config.regex = message.text
+            bot.send_message(message.chat.id, f'Регулярное выражение установлено', reply_markup=markup)
+        elif message.text.lower() == '/flag':
+            config.flag_question = not config.flag_question
+            bot.send_message(message.chat.id, f'Флаг {config.flag_question}', reply_markup=markup)
 
 def start_bot():
     """Функция запуска бота"""

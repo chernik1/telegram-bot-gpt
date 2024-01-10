@@ -9,7 +9,8 @@ if __name__ == '__main__':
 
     cur.execute("""CREATE TABLE IF NOT EXISTS multitask(
         name_multitask TEXT PRIMARY KEY,
-        answer TEXT
+        answer TEXT,
+        question TEXT
     )""")
 
     conn.commit()

@@ -14,6 +14,7 @@ class Config:
     prompt = ''
     name_multitask = 'base'
     db_action_for_pack: bool = False
+    flag_question: bool = False
 
     def __str__(self):
         return 'symbols: ' + self.symbols + '\n' + 'regex: ' + self.regex + '\n' + 'promt: ' + self.prompt + '\n' + 'tasks: ' + self.tasks + '\n' + 'promt_constant: ' + self.prompt_constant + '\n' + 'regex_promt: ' + self.regex_prompt
