@@ -6,14 +6,15 @@ from typing import Any, Dict
 
 @dataclasses.dataclass
 class Config:
-    symbols: str = '5000'
-    regex: str = r'(?:\d{1,3}\..+?)(?=\d{1,3}\.|$)'
+    symbols: str = '1000'
+    #regex: str = r'(?:\d{1,3}\..+?)(?=\d{1,3}\.|$)'
+    regex: str = r'[^.]+'
     tasks: str = ''
     prompt_constant: str = 'Выполни задачу.'
     regex_prompt: str = ''
     prompt = ''
     name_multitask = 'base'
-    db_action_for_pack: bool = False
+    db_action_for_multitask: bool = False
     flag_question: bool = False
 
     def __str__(self):

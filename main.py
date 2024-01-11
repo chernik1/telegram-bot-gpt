@@ -17,12 +17,7 @@ if __name__ == '__main__':
 
     conn.close()
 
-    while True:
-        try:
-            start_bot()
-        except Exception as e:
-            print(e)
-            continue
+    start_bot()
 
 
 

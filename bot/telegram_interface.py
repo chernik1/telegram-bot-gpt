@@ -42,7 +42,7 @@ def handle_message(message):
                 response__split_3999 = [response_full[i:i + 3888] for i in range(0, len(response_full), 3888)]
                 for response in response__split_3999:
                     bot.send_message(message.chat.id, str(list_numbers[i]) + response, reply_markup=markup)
-        elif message.text.lower() == 'help':
+        elif message.text.lower() == '/help':
                 bot.send_message(message.chat.id, """
                             Help
         Обычный запрос - /prompt или /pr tasks***prompt_constant
@@ -81,22 +81,22 @@ def handle_message(message):
             responses = responses_status[0]
             status = responses_status[1]
             answer = responses_status[2]
-            const_num = 1
+            const_num = 81
             if status:
                 for id, response in enumerate(responses, const_num):
 
                     db = sqlite3.connect(r'db/database.db')
                     cur = db.cursor()
 
-                    existing_name_pack = cur.execute(f"""SELECT name_pack FROM multitask WHERE name_multitask = ?""",
+                    existing_name_pack = cur.execute(f"""SELECT name_multitask FROM multitask WHERE name_multitask = ?""",
                                                   (info[0] + '_',)).fetchone()
 
                     if existing_name_pack:
                         print('Уже есть')
                     else:
                         # Выполните вставку новой записи
-                        cur.execute(f"""INSERT INTO pack(name_multitask, answer, question) VALUES(?, ?, ?)""",
-                                    (info[0] + '_' + str(id), response, answer))
+                        cur.execute(f"""INSERT INTO multitask(name_multitask, answer, question) VALUES(?, ?, ?)""",
+                                    (info[0] + '_' + str(id), response, answer[id - const_num]))
                         db.commit()
 
                     db.close()
