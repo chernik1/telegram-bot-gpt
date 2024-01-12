@@ -45,14 +45,14 @@ def handle_message(message):
         elif message.text.lower() == '/help':
                 bot.send_message(message.chat.id, """
                             Help
-        Обычный запрос - /prompt или /pr tasks***prompt_constant
-        Запрос о предмете - /prompt или /pr pack***tasks***prompt_constant
-        Удаление запроса - /delete или /del pack***prompt
-        Получить вопрос для определенного предмета - /action или /act pack
+        Обычный запрос - /prompt tasks***prompt_constant или /pr tasks***prompt_constant
+        Запрос о предмете - /prompt name_multitask***tasks***prompt_constant или /pr name_multitask***tasks***prompt_constant
+        Удаление запроса - /delete name_multitask***prompt или /del name_multitask***prompt
+        Получить вопрос для определенного предмета - /action name_multitask или /act name_multitask
         Остановить запрос для определенного предмета - /cl ac или /clear action
         Конфигурация - /config или /cfg
         Установить regex - /set regex выражение
-        Получить ответ - /ans или /answer name_multitask***answer_id
+        Получить ответ - /ans name_multitask***answer_id или /answer name_multitask***answer_id
                     """, reply_markup=markup)
                 bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
         elif (message.text[:4] == '/ans' or message.text[:7] == '/answer') and len(message.text.split('***')) == 2:
