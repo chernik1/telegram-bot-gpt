@@ -6,7 +6,7 @@ from threading import Thread
 from queue import Queue
 from config import Config
 
-async def make_prompt(prompt):
+async def make_prompt(prompt: str) -> str:
     try:
         response = await g4f.ChatCompletion.create_async(
             model=g4f.models.default,
@@ -18,7 +18,7 @@ async def make_prompt(prompt):
         response = ['None']
     return response
 
-async def create_tasks(prompt_list):
+async def create_tasks(prompt_list: list) -> list:
     tasks = []
     for index, prompt in enumerate(prompt_list):
 
@@ -27,7 +27,7 @@ async def create_tasks(prompt_list):
 
     return tasks
 
-async def validate_response(response):
+async def validate_response(response: str) -> str:
     try:
         regex_link_begin = r'\[\d+\]:\s*".*?"' # ссылки в скобках
         regex_link_end = r'\bhttps?://\S+\b' # конечные ссылки
@@ -44,7 +44,7 @@ async def validate_response(response):
         return 'Неудача'
 
 
-async def start_ai(config: Config):
+async def start_ai(config: Config) -> tuple:
     prompt = config.prompt
     symbols = config.symbols.strip()
     regex = config.regex.strip()
@@ -87,7 +87,7 @@ async def start_ai(config: Config):
         status = False
         return (None, status)
 
-def run_ai(prompt_user=None):
+def run_ai(prompt_user=None) -> tuple:
     time_start = time.time()
     result_queue = Queue()
     print(time_start)

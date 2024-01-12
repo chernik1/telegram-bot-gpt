@@ -21,7 +21,7 @@ def form_info() -> dict:
 
     return info
 
-def form_table(info) -> Document:
+def form_table(info: dict) -> Document:
     doc = Document()
     table = doc.add_table(rows=1, cols=2)
     table.cell(0, 0).text = 'Вопрос'

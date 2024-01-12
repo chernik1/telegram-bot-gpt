@@ -14,7 +14,7 @@ import string
 alphabet = string.ascii_lowercase
 
 @bot.message_handler(commands=['start', 'main'])
-def start(message):
+def start(message: types.Message) -> None:
     """Функция запуска интерфейса для пользователя"""
     global markup
     markup = types.ReplyKeyboardMarkup()
@@ -28,7 +28,7 @@ def start(message):
 
 
 @bot.message_handler(func=lambda message: True)
-def handle_message(message):
+def handle_message(message: types.Message) -> None:
     """Функция обработки сообщений"""
     global config
 
@@ -153,7 +153,7 @@ def handle_message(message):
             config.flag_question = not config.flag_question
             bot.send_message(message.chat.id, f'Флаг {config.flag_question}', reply_markup=markup)
 
-def start_bot():
+def start_bot() -> None:
     """Функция запуска бота"""
     global config, markup
 

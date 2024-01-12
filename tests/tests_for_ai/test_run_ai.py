@@ -17,7 +17,7 @@ def form_config() -> Config:
 
     return config
 
-def test_tasks_and_promt_constant():
+def test_tasks_and_promt_constant() -> None:
     config = form_config()
 
     responses_status = run_ai(config)
