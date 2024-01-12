@@ -52,6 +52,7 @@ def handle_message(message):
         Остановить запрос для определенного предмета - /cl ac или /clear action
         Конфигурация - /config или /cfg
         Установить regex - /set regex выражение
+        Получить ответ - /ans или /answer name_multitask***answer_id
                     """, reply_markup=markup)
                 bot.send_message(message.chat.id, f'{config.__str__()}', reply_markup=markup)
         elif (message.text[:4] == '/ans' or message.text[:7] == '/answer') and len(message.text.split('***')) == 2:
