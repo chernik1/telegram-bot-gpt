@@ -7,7 +7,7 @@ import re
 import sqlite3
 import time
 
-    bot = telebot.TeleBot('TOKEN')
+bot = telebot.TeleBot('TOKEN')
 
 import string
 
